@@ -4,7 +4,7 @@
 
 [TOC]
 
-## Exercise 1 pg 20
+## Exercise 1 pag 20
 
 ### Description
 
@@ -21,7 +21,7 @@ To do.
 - Map: $(ID, x_i) \longrightarrow (d_{ij},x_i)$ where $d_{ji}=d_{ij}=\max{\{i,j\}}+\min{\{i,j\}}\cdot N$.
 - Reduce:
 
-## Exercise 2 pg 20
+## Exercise 2 pag 20
 
 ###Description
 
@@ -31,37 +31,28 @@ Show how to implement one iteration of Lloyd’s algorithm in MapReduce using a 
 
 To do.
 
-## Exercise 3 pg 47
+## Exercise 3 pag 47
 
 ### Description
 
-Let $\mathcal{C}_{alg} = Partition(P, S)​$ be the k-clustering of $P​$ induced by the set $S​$ of centers returned by *k-means++*. 
-Using Markov’s inequality determine a value $α > 1​$ such that $Pr (\phi_{kmeans}(\mathcal{C}_{alg} ) ≤ \alpha · \phi^{opt}_{kmeans}(k)) \geq 1/2​$.
-Recall that for a real-valued nonnegative random variable $X​$ with expectation $E[X]​$ and a value $a > 0​$, the Markov’s inequality states that $Pr(X ≥ a) ≤ \cfrac{E[X]}{a}​$.
+Let $\mathcal{C}_{alg} = Partition(P, S)$ be the *k-clustering* of $P$ induced by the set $S$ of centers returned by *k-means++*. 
+Using Markov’s inequality determine a value $α > 1$ such that $Pr (\phi_{kmeans}(\mathcal{C}_{alg} ) ≤ \alpha · \phi^{opt}_{kmeans}(k)) \geq 1/2$.
+Recall that for a real-valued nonnegative random variable $X$ with expectation $E[X]$ and a value $a > 0$, the Markov’s inequality states that $Pr(X ≥ a) ≤ \cfrac{E[X]}{a}$.
 
-### Solution $\checkmark$ 
+### Solution $\checkmark$
 
-From theorem in slide 18 we know that   $E[\phi_{kmeans} (\mathcal{C}_{alg})] ≤ 8(ln(k) + 2) · \phi^{opt}_{kmeans}(k)​$.
-Using Markov inequality: $Pr(\phi_{kmeans} (\mathcal{C}_{alg}) ≥ a) ≤ \cfrac{E[\phi_{kmeans} (\mathcal{C}_{alg})]}{a}​$ .
-Substituting the expectation from theorem above we get:
-$Pr(\phi_{kmeans} (\mathcal{C}_{alg}) ≥ a) ≤ \cfrac{E[\phi_{kmeans} (\mathcal{C}_{alg})]}{a} \le \cfrac{8(ln(k) + 2) · \phi^{opt}_{kmeans}(k)}{a}​$. 
-Putting $a = \alpha · \phi^{opt}_{kmeans}(k)​$  we obtain:
-$Pr(\phi_{kmeans}(\mathcal{C}_{alg})\ge \alpha\cdot \phi^{opt}_{kmeans}(k)) \le \cfrac{8(ln(k) + 2) · \phi^{opt}_{kmeans}(k)}{\alpha\cdot \phi^{opt}_{kmeans}(k)}=\cfrac{8(ln(k)+2)}{\alpha}​$.
-Solving the equation we get:
-$\cfrac{8(\ln{(k)}+2)}{\alpha} =\cfrac{1}{2} \implies \alpha=16(\ln{k}+2)​$. Note that $\alpha \ge 32​$ for $k\ge 1​$.
-This means:
-$Pr(\phi_{kmeans}(\mathcal{C}_{alg})\ge \alpha\cdot \phi^{opt}_{kmeans}(k)) \le \cfrac{1}{2}​$    for    $\alpha=16(\ln{k}+2)​$.
-And the reverse probability is: $1 - Pr(\phi_{kmeans}(\mathcal{C}_{alg})\ge \alpha\cdot \phi^{opt}_{kmeans}(k)) = Pr(\phi_{kmeans}(\mathcal{C}_{alg})\le \alpha\cdot \phi^{opt}_{kmeans}(k))​$. 
-So $Pr(\phi_{kmeans}(\mathcal{C}_{alg})\le \alpha\cdot \phi^{opt}_{kmeans}(k))\ge \cfrac{1}{2}​$   for    $\alpha=16(\ln{k}+2)​$.
+From *theorem* in slide 18 we know that  $E[\phi_{kmeans} (\mathcal{C}_{alg})] ≤ 8(ln(k) + 2) · \phi^{opt}_{kmeans}(k)​$.
 
-**Official solution**:
+Then we obtain $Pr(\phi_{kmeans}(\mathcal{C}_{alg})\le \alpha\cdot \phi^{opt}_{kmeans}(k)) \ge Pr(\phi_{kmeans}(\mathcal{C}_{alg})< \alpha\cdot \phi^{opt}_{kmeans}(k)) = 1-Pr(\phi_{kmeans}(\mathcal{C}_{alg})\ge \alpha\cdot \phi^{opt}_{kmeans}(k)) ​$
 
-First we know: $Pr(\phi_{kmeans}(\mathcal{C}_{alg})\le \alpha\cdot \phi^{opt}_{kmeans}(k)) \ge Pr(\phi_{kmeans}(\mathcal{C}_{alg})< \alpha\cdot \phi^{opt}_{kmeans}(k)) = 1-Pr(\phi_{kmeans}(\mathcal{C}_{alg})\ge \alpha\cdot \phi^{opt}_{kmeans}(k)) $ 
-Then by Markov:
-$1-Pr(\phi_{kmeans}(\mathcal{C}_{alg})\ge \alpha\cdot \phi^{opt}_{kmeans}(k)) \ge 1-\cfrac{8(ln(k) + 2) · \phi^{opt}_{kmeans}(k)}{\alpha\cdot \phi^{opt}_{kmeans}(k)}=\cfrac{8(ln(k)+2)}{\alpha} \ge \cfrac{1}{2}$.
-Then: $\alpha=16(\ln{k}+2)​$.
+Then using Markov inequality and the *theorem* we have
+$1-Pr(\phi_{kmeans}(\mathcal{C}_{alg})\ge \alpha\cdot \phi^{opt}_{kmeans}(k)) \stackrel{\text{Markov}}{\ge} 1-\cfrac{E[\phi_{kmeans}(\mathcal{C_{alg}})]}{\alpha\cdot \phi^{opt}_{kmeans}(k)} \stackrel{\text{Theorem}}{\ge} 1-\cfrac{8(ln(k) + 2) · \phi^{opt}_{kmeans}(k)}{\alpha\cdot \phi^{opt}_{kmeans}(k)}=\\=1-\cfrac{8(ln(k)+2)}{\alpha}​$
 
-## Exercise 4 pg 48
+So putting the pieces together we have  $Pr (\phi_{kmeans}(\mathcal{C}_{alg} ) ≤ \alpha · \phi^{opt}_{kmeans}(k)) \ge 1-\cfrac{8(ln(k)+2)}{\alpha}$
+And we want the quantity on the right to be  $\ge \cfrac{1}{2}$. Thus we want $\cfrac{8(ln(k)+2)}{\alpha} \le \cfrac{1}{2}$.
+Solving the inequality we see that the bound is true with any  $\alpha \ge 16(\ln{k}+2)​$.
+
+## Exercise 4 pag 48
 
 ### Description
 
@@ -72,13 +63,13 @@ Show that the same approximation ratio, but with probability at least $1 − 1/N
 
 ### Solution $\checkmark$
 
-Suppose we run a certain number of consecutive *k-means++* and partitioning and each time we test whether the objective function $\phi_{kmeans}$ respect the inequality  $\phi_{kmeans} (\mathcal{C}_{alg}) ≤ \alpha · \phi^{opt}_{kmeans}(k)$, for a known $\alpha >1$. At every run we save the objective function and update $\mathcal{C}_{best}=argmin~\phi(\mathcal{C}_i)$, the best clustering found. Every run is independent from the other as long as the first point is selected at random every time.
-We define a random variable $Y=0 \iff$ the inequality is not respected and 1 otherwise. The probability to have a 1 is $\ge 1/2$.
-This defines a Bernoulli distribution $Ber(p\ge1/2)$.
-Define then a random variable $X=$("number of $Y=1$ in a series of $M$ trials"). This defines a binomial distribution $Bin(M,p\ge\frac{1}{2})$.
+Suppose we run a certain number of consecutive *k-means++* and partitioning and each time we test whether the objective function $\phi_{kmeans}​$ respect the inequality  $\phi_{kmeans} (\mathcal{C}_{alg}) ≤ \alpha · \phi^{opt}_{kmeans}(k)​$, for a known $\alpha >1​$. At every run we save the objective function and update $\mathcal{C}_{best}=argmin~\phi(\mathcal{C}_i)​$, the best clustering found. Every run is independent from the other as long as the first point is selected at random every time.
+We define a random variable $Y=0 \iff​$ the inequality is not respected and 1 otherwise. The probability to have a 1 is $\ge 1/2​$.
+This defines a Bernoulli distribution $Ber(p\ge1/2)​$.
+Define then a random variable $X=​$("number of $Y=1​$ in a series of $M​$ trials"). This defines a binomial distribution $Bin(M,p\ge\frac{1}{2})​$.
 Since at every run of *k-means++* we save the best clustering we need just one run to satisfy the inequality to prove the bound.
-Then $Pr(X\ge 1) = 1-Pr(X=0)\ge 1-\binom{M}{0}\cdot(\frac{1}{2})^0\cdot(1-\frac{1}{2})^M=1-\cfrac{1}{2^M}$.
-So with at least $M=\lceil\log_2{N}\rceil$ trials the bound is satisfied with probability $\ge 1-\cfrac{1}{N}$.
+Then $Pr(X\ge 1) = 1-Pr(X=0)\ge 1-\binom{M}{0}\cdot(\frac{1}{2})^0\cdot(1-\frac{1}{2})^M=1-\cfrac{1}{2^M}​$.
+So with at least $M=\lceil\log_2{N}\rceil​$ trials the bound is satisfied with probability $\ge 1-\cfrac{1}{N}​$.
 
 ## Exercise 5 pg 48
 
@@ -90,23 +81,25 @@ Show that the *PAM* algorithm always terminates.
 
 **PAM Algorithm pseudocode**
 
-Input: Set $P$ of $ N$ points from $\mathbb{R}^D$ , integer $k > 1$
-Output *k-clustering* $C = (C_1 , C_2 , . . . , C_k ; c_1 , c_2 , . . . , c_k )$ of $P$ with small $Φ_{kmedian}(C)$ .
+Input: Set $P$ of $ N$ points from $\R^D$ , integer $k > 1$
+Output: *k-clustering* $C = (C_1 , C_2 , . . . , C_k ; c_1 , c_2 , . . . , c_k )$ of $P$ with small $\phi_{kmedian}(C)$ 
 
-$ S ← \{c_1 , c_2 , . . . , c_k\}$ (arbitrary set of $k$ points of $P$)
-$C ← Partition(P, S)$
-stopping-condition $← false$
-while ($!$stopping-condition​) do
-	stopping-condition ​$← true$
-	for each ​$p ∈ P − S$ do
-		for each ​$c ∈ S$ do ​$S_0 ← (S \setminus \{c\}) ∪ {p}$
-			$C_0 ← Partition(P, S_0)$
-			if $Φ_{kmedian} (C_0) < Φ_{kmedian} (C)$ then
-				stopping-condition $← false$
-				$C ← C_0$
-				$S ← S_0$
+$ S ← \{c_1 , c_2 , . . . , c_k\}​$ (arbitrary set of $k​$ points of $P​$)
+$C ← Partition(P, S)​$
+stopping-condition $← false​$
+while ($!​$stopping-condition​) do
+	stopping-condition ​$← true​$
+	for each ​$p ∈ P − S​$ do
+		for each ​$c ∈ S​$ do ​$S_0 ← (S \setminus \{c\}) ∪ \{p\}​$
+			$C_0 ← Partition(P, S_0)​$
+			if $\phi_{kmedian} (C_0) < \phi_{kmedian} (C)​$ then
+				stopping-condition $← false​$
+				$C ← C_0​$
+				$S ← S_0​$
 				exit both for-each loops
 return $ C​$
 
 **Reason why it stops**
-Because at every iteration a new set of centers is used, otherwise the algorithm stops. Using the same set of centers is not possible because the function must decrease.
+At any moment the function $\phi(\mathcal{C})$ is the minimum value of objective function for *k-median* encountered to that moment. At every iteration the two for each loops consider all possible clustering over all possible combination of points. If inside these loops is not possible to find a better solution than the current optimal, the algorithm will never enter the inner *if* and the *stopping-condition* will remain set to $true$.
+Additionally the value of the $\phi_{kmedian} (C)$ must decrease in every iteration to allow the algorithm to do another *while* iteration, since the *if* statement requires a strict inequality to set *stopping-condition* to $false​$.
+Thus the PAM algorithm surely stops.
