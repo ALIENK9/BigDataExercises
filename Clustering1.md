@@ -6,24 +6,24 @@
 
 ## Exercise 2 pag 26
 
-### Task
+### Description
 
-Let $|P| = N​$ and suppose that each point $x ∈ P​$ is represented as a key-value pair $(ID_x , (x, f ))​$, where $ID_x​$ is a distinct integer in $[0, N)​$, and $f​$ is a binary flag which is 1 if $x ∈ S​$ and 0 otherwise. 
-Design a 1-round *MapReduce* algorithm that implements $Partition(P, S)​$ with $M_L = O (k)​$ and $M_A = O (N)​$.
-(Assume that $k​$ and $N​$ are known.)
+Let $|P| = N$ and suppose that each point $x ∈ P$ is represented as a key-value pair $(ID_x , (x, f ))$, where $ID_x$ is a distinct integer in $[0, N)$, and $f$ is a binary flag which is $1$ if $x ∈ S$ and $0$ otherwise. 
+Design a 1-round *MapReduce* algorithm that implements $Partition(P, S)$ with $M_L = O (k)$ and $M_A = O (N)$.
+(Assume that $k$ and $N$ are known.)
 
 ### Solution
 
-Partition algorithm to perform clustering from a set $S$ of $k$ centers and a set $P$ of points where $S \subseteq P$ has the following pseudocode:
+Partition algorithm to perform clustering from a set $S​$ of $k​$ centers and a set $P​$ of points where $S \subseteq P​$ has the following pseudocode:
 
 **Partition(P, S)**
 Let $S = {c_1 , c_2 , . . . , c_k } ⊆ P$
-*for*  $i ← 1$   *to*   $k$  *do*  $C_i ← {c_i}$ 	// Initialize each cluster with its centroid
-*for* *each*  $p ∈ P \setminus S$  *do*	    	// For each point that is not a centroid 
-	$\ell← argmin_{i=1,k}~\{d(p, c_i )\}$    // Get the index of the cluster whose centroid is closer to $p$ (ties broken arbitrarily)
-	$C_\ell \leftarrow C_\ell ∪ \{p\}$			// Assign $p$ to the cluster of the closest centroid 
+*for*  $i ← 1$   *to*   $k$  *do*  $C_i ← {c_i}$ 	// Initialize each cluster with its center
+*for* *each*  $p ∈ P \setminus S$  *do*	    	// For each point that is not a center 
+	$\ell← argmin_{i=1,k}~\{d(p, c_i )\}$    // Get the index of the cluster whose center is closer to $p$ (ties broken arbitrarily)
+	$C_\ell \leftarrow C_\ell ∪ \{p\}$			// Assign $p$ to the cluster of the closest center 
 $C ← (C_1 , C_2 , . . . , C_k ; c_1 , c_2 , . . . , c_k)$	
-*return* $C$					    // Return the clustering
+*return* $C​$					    // Return the clustering
 
 The map reduce algorithm is the following:
 
@@ -31,18 +31,18 @@ Input:  $(ID_x , (x, f ))$ where $ID_x \in [0,N)$ and $f = 1 \iff x\in S$
 Output: $(ID_x, (x,\ell))$ where $\ell$ is the number of the cluster which $x$ was assigned to.
 
 **Round 1**
-*Map*: map each point $x \in P\setminus S$ in $k$ different pair representing the distance between $x$ and each of the $k$ different centroids. This means:  $(ID_x , (x, f )) \longrightarrow (ID_x, (x, c_i, d(x,c_i)))~~~\forall i\in1..k$.
-The add $k$ pairs $(ID_{c_i}, (c_i,c_i,0))$ for each of the centroids $c_i~\forall i\in1..k$.
-At the end of the round there will be $(N-k)k + k$ different pairs, $k$ pairs for each of the $N-k$ points that are not centroids, plus one pair for each of the $k​$ centroids.
 
-*Reduce*: gather by key $ID_x$, obtaining subsets of at most $k$ pairs each (precisely of either 1 or $k$ pairs), and output the pair $(ID_x, (x, \ell))$ where $\ell = argmin_{i=1..k}\{d(x,c_i)\}$.
+- *Map*: map each point $x \in P\setminus S$ in $k$ different pair representing the distance between $x$ and each of the $k$ different centers. This means:  $(ID_x , (x, f=0)) \longrightarrow (ID_x, (x, c_i, d(x,c_i)))~~~\forall i\in1..k$.
+  Then add $k$ pairs $(ID_{c_i}, (c_i,c_i,0))$ for each of the centers $c_i~\forall i\in1..k$ (distance is $0$ of course).
+  At the end of the round there will be $(N-k)\cdot k + k$ different pairs, $k$ pairs for each of the $N-k$ points that are not centers, plus one pair for each of the $k$ centers.
+- *Reduce*: gather by key $ID_x$, obtaining subsets of at most $k$ pairs each (precisely of either 1 or $k$ pairs), and output the pair $(ID_x, (x, \ell))$ where $\ell = \arg\!\min_{i=1..k}\{d(x,c_i)\}​$.
 
 **Analysis**
-The size of the output of the map phase doesn't count in the analysis on $M_L$, since the pairs need not to be stored in the memory of the worker in charge of this computation. For the reduce phase only $k$ pairs must be handled at the same time, so $M_L=O(k)$ and $M_A=O(N)$.
+The size of the output of the map phase doesn't count in the analysis on $M_L$, since the pairs need not to be stored in the memory of the worker in charge of this computation. For the reduce phase only $k$ pairs must be handled at the same time, thus $M_L=O(k)$. The reduce phase has to deal with $(N-k)\cdot k+k$ subsets of at most $k$ pairs so $M_A=\cfrac{(N-k)\cdot k+k}{k}=O(N)​$.
 
 ## Exercise 2 pag 37
 
-### Task
+### Description
 
 Show that the Farthest-first traversal algorithm can be implemented to run in $O(N · k)​$ time.
 **Hint**: make sure that in each iteration *i* of the first for-loop each point $p \in P \setminus S​$ knows its closest center among $c_1, c_2, . . . , c_{i−1}​$ and the distance from such a center.
@@ -76,7 +76,7 @@ Distances is a structure where $D[i].closest​$ returns the closest center to p
 
 ## Exercise 3 pag 50
 
-### Task
+### Description
 
 Let $P$ be a set of points in a metric space $(M, d)$, and let $T ⊆ P$. 
 For any $k < |T |, |P|$, show that  $\phi^{opt}_{kcenter}(T , k) ≤ 2\phi^{opt}_{kcenter} (P, k)$. Is the bound tight?
@@ -87,7 +87,7 @@ Boh.
 
 ## Exercise 5 pag 51
 
-### Task
+### Description
 
 Let $P$ be a set of $N$ points in a metric space $(M, d)$, and let $C = (C_1 , C_2 , . . . , C_k ; c_1 , c_2 , . . . , c_k)$ be a k-clustering of $P$. Initially, each point $q ∈ P$ is represented by a pair $(ID(q), (q, c(q)))$, where $ID(q)$ is a distinct key in $[0, N − 1]$ and $c(q) ∈ \{c_1 , . . . , c_k\}$ is the center of the cluster of $q$.
 
@@ -97,34 +97,47 @@ Let $P$ be a set of $N$ points in a metric space $(M, d)$, and let $C = (C_1 , C
 ### Solution
 
 **Round 1**
-*Map*: map each point $(ID(q), (q, c(q))) \longrightarrow (ID(q)~\text{mod}~\sqrt{N}, (q,c(q)))$.
-*Reduce*: gather by key the subsets $P^j$ and for each different $c(q)$ produce the pair $(ID, (c(q), q_j))$ where $q_j=argmax_{j}\{d(c(q_j),q_j)\}~\forall~q_j\in P^j$.
-Note that $ID \in [0, \sqrt{N})$ and each subset $P^j$ produce with the reduce phase a number of pairs $\le |P^j|$.
+- *Map*: map each point $(ID(q), (q, c(q))) \longrightarrow (ID(q)\mod\sqrt{N}, (q,c(q)))​$.
+- *Reduce*: gather by key the subsets $P^j​$ and for each different $c(q)​$ produce the pair $(c(q_j), (q_j, d(c(q_j),q_j)))​$ where $q_j=\arg\!\max_{q_j}\{d(c(q_j),q_j)~~\forall~q_j\in P^j\}​$.
+Note that new key $c(q_j) \in [1, k]​$ and each subset $P^j​$ produces at most one pair with key $c(q_j)​$. Since we have $\sqrt{N}​$ subset after this phase there are at most $\sqrt{N}​$ element with same key.
 
 **Round 2**
-*Map*: map each point $(ID, (c(q), q)) \longrightarrow (c(q), (q, d(c(q), q)))$.
-*Reduce*: gather by key and produce the pair $(c(q), q_{max})$ where $q_{max}=argmax_{q} \{d(c(q), q)\}$.
 
-## Exercise 6 pag 
+- *Map*: identity.
+- *Reduce*: gather by key the at most $\sqrt{N}​$ pairs in the form $(c(q), (q, d(c(q),q)))​$ and for each subset $P^k​$ and produce the pair $(c(q_{max}), q_{max})​$ where $q_{max}=\arg\!\max_{q} \{d(c(q), q)~~\forall~q\in P^k\}​$.
+
+**Analysis**
+At each round at most  $\sqrt{N}$ pairs are kept in the same subset so $M_L=O(\sqrt{N})$. First reduce phase has to deal with $\sqrt{N}$ subsets of $\sqrt{N}$ pairs each, so $M_A=O(N)$. Clearly $M_L \in o(N)$ as required.
+
+## Exercise 6 pag 52
 
 ### Description
 
-Set $P$ of $N$ points bi-colored. They are partitioned in $k$ clusters.
-$\mathbb{D}_x\in [0,N)$, $i_x \in[1,k]$ index of the cluster they belong to, $\gamma_x\in \{0,1\}$ is the color.
-Design a 2 round algorithm in MR to check whether every cluster $C_i$ is solid, i.e. that every cluster contains points of the same color.
-Output: $\{(i,b_i)~\forall~1 \le i \le k\}$ where $b_i=-1/0/1$ depending on whether points of $C_i$ have different colors, points have color 0 or color 1.
+Let $P$ be a set of $N$ bi-colored points, partitioned in $k$ clusters $C_1,C_2,...,C_k$. Design a 2 round algorithm in MR to check whether every cluster $C_i$ is solid (i.e. whether a cluster contains all points of the same color).
+Analyze the local and aggregate space required by your algorithm. Your algorithm must require $o(N)$ local space and $O(N)$ aggregate space.
+
+Input: $\{(ID_x, (x,i_x,\gamma_x))~~~\forall x\in P\}​$.
+Where $ID_x\in [0,N)​$, $i_x \in[1,k]​$ is the index of the cluster a point belongs to, $\gamma_x\in \{0,1\}​$ is the color.
+
+Output: $\{(i,b_i)~~~\forall~1 \le i \le k\}​$.
+Where $b_i=\begin{cases}
+-1 \iff \text{there exist two points $\in C_i$ with different color}\\~~~0 \iff \text{every point $\in C_i$ have color 0}\\~~~1 \iff \text{every point $\in C_j$ have color 1} \end{cases}​$ 
 
 ### Solution $\checkmark$
 
 **Round 1**
 
-- Map: $(ID_x, (x,i_x,\gamma_x)) \longrightarrow (ID_x \mod \sqrt{N}, (x,i_x,\gamma_x))​$.
-- Reduce: $\forall~\ell \in [0,\sqrt{N})$ gather by key pairs $(\ell, (x,i_x,\gamma_x))$. For each cluster $C_j$ compute $b_j(\ell)=-1/0/1$ if points of $C_j$ in partition $\ell$ have different colors or color 0 or 1. Produce for each cluster the pair $(j, b_j(\ell))$.
+- *Map*: $(ID_x, (x,i_x,\gamma_x)) \longrightarrow (ID_x\mod \sqrt{N}, (x,i_x,\gamma_x))$.
+- *Reduce*: $\forall~\ell \in [0,\sqrt{N})$ gather by key pairs $(\ell, (x,i_x,\gamma_x))$. Considering each partition $\ell$, reduce the pairs belonging to the same cluster $C_j = \{\text{pairs with}~i_x=j\}$ to a single pair $(j, b_j(\ell))$, where
+  $b_j(\ell)=\begin{cases}
+  -1 \iff \text{points of $C_j$ in partition $\ell$ have different color}\\~~~0 \iff \text{every point of $C_j$ in partition $\ell$ have color 0}\\~~~1 \iff \text{every point of $C_j$ in partition $\ell$ have color 1} \end{cases}$
+  Note that reduce phase produce at most $\sqrt{N}$ pairs for each cluster (with same key $j$).
 
 **Round 2**
 
-- Map: identity
-- Reduce: $\forall~1\le j \le k$ gather pairs $(j, b_j(\ell))$ with $0 \le \ell < \sqrt{N}$ and output the pair $(j, b_j)$ where $b_j = -1 \iff \exists~\ell' \and \ell''.(b_j(\ell')=0~\and~b_j(\ell'')=1)$, $b_j=0 \iff \forall~\ell.b_j(\ell)=0$, $b_j=1 \iff \forall~\ell.b_j(\ell)=1$.
+- *Map*: identity
+- *Reduce*: $\forall~1\le j \le k​$  gather the at most $\sqrt{N}​$ pairs $(j, b_j(\ell))​$ with $0 \le \ell < \sqrt{N}​$ and output the pair $(j, b_j)​$ where $b_j=\begin{cases}
+  -1\iff \exists~\ell' \and \ell''.(b_j(\ell')=0~\and~b_j(\ell'')=1)\\~~~0 \iff \forall~\ell.b_j(\ell)=0\\~~~1 \iff \forall~\ell.b_j(\ell)=1 \end{cases}​$
 
 **Analysis**
-$M_L=O(\sqrt{N})$, $M_A=O(N)$.
+Input pairs for any phase are at most $\sqrt{N}$, so  $M_L=O(\sqrt{N})=o(N)$ and we have to process $\sqrt{N}$ partitions of $\sqrt{N}$ pairs each, thus $M_A=O(N)$.

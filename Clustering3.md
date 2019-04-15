@@ -47,16 +47,16 @@ Now we have $t$ pairs containing the distance between each point in $X$ and $P$ 
 At each round the input is at most $t$ pairs. So $M_L=O(t)$ and aggregate space $O(t\cdot N)$ since totally we have $t$ sets of $N/t$ pairs, each set replicated $t$ times.
 Setting $t=o(N)$, like $t=\sqrt{N}$ ensures good solution.
 
-## Exercise 2 pg 13
+## Exercise 2 pag 13
 
 ### Description
 
-Let $P$ be a pointset of $N$ points in a metric space $(M, d)$ and let $C ⊆ P$ be a subset of $P$ of size $n$. Show how to compute $\tilde{d}_{sum} (p, C , t)$ efficiently in *MapReduce*, for all $p \in P​$. Assume that
+Let $P$ be a pointset of $N$ points in a metric space $(M, d)$ and let $C ⊆ P$ be a subset of $P$ of size $n$. Show how to compute $\tilde{d}_{sum} (p, C , t)$ efficiently in *MapReduce*, for all $p \in P$. Assume that
 
 - $t$ and $n$ are known;
 - $t ∈ O(\log{N})​$;
-- each point of $P$ is provided with an *ID* in $[0, N − 1]$ and the points of $C$ are those with *IDs* 0, 1, . . . , $n$ − 1.
-  Note that $n​$ can be very large.
+- each point of $P$ is provided with an *ID* in $[0, N − 1]$ and the points of $C$ are those with *IDs* $\in \{0, 1, . . . , n− 1\}$.
+  Note that $n$ can be very large.
 
 ### Solution
 
