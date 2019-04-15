@@ -105,3 +105,26 @@ Note that $ID \in [0, \sqrt{N})$ and each subset $P^j$ produce with the reduce p
 *Map*: map each point $(ID, (c(q), q)) \longrightarrow (c(q), (q, d(c(q), q)))$.
 *Reduce*: gather by key and produce the pair $(c(q), q_{max})$ where $q_{max}=argmax_{q} \{d(c(q), q)\}$.
 
+## Exercise 6 pag 
+
+### Description
+
+Set $P$ of $N$ points bi-colored. They are partitioned in $k$ clusters.
+$\mathbb{D}_x\in [0,N)$, $i_x \in[1,k]$ index of the cluster they belong to, $\gamma_x\in \{0,1\}$ is the color.
+Design a 2 round algorithm in MR to check whether every cluster $C_i$ is solid, i.e. that every cluster contains points of the same color.
+Output: $\{(i,b_i)~\forall~1 \le i \le k\}$ where $b_i=-1/0/1$ depending on whether points of $C_i$ have different colors, points have color 0 or color 1.
+
+### Solution $\checkmark$
+
+**Round 1**
+
+- Map: $(ID_x, (x,i_x,\gamma_x)) \longrightarrow (ID_x \mod \sqrt{N}, (x,i_x,\gamma_x))​$.
+- Reduce: $\forall~\ell \in [0,\sqrt{N})$ gather by key pairs $(\ell, (x,i_x,\gamma_x))$. For each cluster $C_j$ compute $b_j(\ell)=-1/0/1$ if points of $C_j$ in partition $\ell$ have different colors or color 0 or 1. Produce for each cluster the pair $(j, b_j(\ell))$.
+
+**Round 2**
+
+- Map: identity
+- Reduce: $\forall~1\le j \le k$ gather pairs $(j, b_j(\ell))$ with $0 \le \ell < \sqrt{N}$ and output the pair $(j, b_j)$ where $b_j = -1 \iff \exists~\ell' \and \ell''.(b_j(\ell')=0~\and~b_j(\ell'')=1)$, $b_j=0 \iff \forall~\ell.b_j(\ell)=0$, $b_j=1 \iff \forall~\ell.b_j(\ell)=1$.
+
+**Analysis**
+$M_L=O(\sqrt{N})$, $M_A=O(N)$.
