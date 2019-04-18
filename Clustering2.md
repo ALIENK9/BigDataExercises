@@ -12,14 +12,88 @@ Show how to implement algorithm *k-means++* in *MapReduce* using $O(k)​$ round
 
 ### Solution
 
-Input: $(ID_x, x)$ 
+Algorithm *k-means++* computes a set $S​$ of $k​$ centers for $P​$ using the following procedure (note that $S ⊆ P​$):
+$c_1 ←​$ random point chosen from $P​$ with uniform probability
+$S ← \{c_1\}​$
+for $i ← 2​$ to $k​$ do
+	$c_i ←​$ random point chosen from $P \setminus S​$, where a point $p​$ is chosen with probability $d(p, S)^2 / \sum\limits_{q∈P\setminus S} (d(q, S))^2​$
+	$S ← S \cup \{c_i\}​$
+return $S​$
 
-To do.
+To prove the exercise I need to prove that it is possible to do a single iteration of *kmeans++* in $O(1)$ rounds with above space constraints. I'll split the MapReduce *kmeans++* procedure in two parts:
+
+- A MapReduce implementation of *Probability(P,S)* that does the computation of probability value for each point
+- An implementation of a single iteration of *kmeans++*
+
+If both the above algorithms can run in $M_L=O(\sqrt{N})$, $M_A=O(N)$ and $O(1)$ rounds then the complete algorithm can run with the same space requirements and $O(k)​$ rounds.
+
+#### Probability(P, S)
+
+This procedure aims at efficiently computing the probability used by *kmeans++* for each point in the set.
+*Input*: $(i, (x_i, f_i))$ where $i$ is a unique number $\in [0, N)$ and $f_i=\begin{cases}0 \iff x_i \in P\setminus S\\1 \iff x_i \in S \end{cases}$ and $|S|=m\le k$. 
+Note that $m=O(N)$.
+*Output*: $(i, (x_i, p))$ where $p$ is the probability of $x_i$ to be chosen as a center computed as described above.
+
+**Round 1**
+Compute squared distances
+
+- *Map*: $(i, x_i) \longrightarrow (x_i, d(x_i, c_j))~\forall~c_j\in S, \forall ~x_i\in P\setminus S$ where $d(x_i, c_j)$ is the distance between center $c_j$ and $x_i$.
+  Note that $m*N$ pairs will be generated.
+- *Reduce*: gather the $O(m)$ pairs and produce a single pair containing the square of the smallest distance: $(x_i, d(x_i, c_j)) \forall ~c_j\in S \longrightarrow (i, (x_i, sd_i))$, where $i$ is an index assigned incrementally in $[0, N-m)$ and $sd_i = d(x_i, S)^2$ (square distance).
+
+**Round 2**
+Compute partial sum of distances
+
+- *Map*: $(i,(x_i, sd_i)) \longrightarrow (i\mod \sqrt{N}, (x_i,sd_i))$.
+- *Reduce*: gather by key the at most $\sqrt{N}$ pairs in each subset $P^j$ and output the same input pairs with a new pair $(n, sum_j)$ where $n\ge \sqrt{N}$ (need to be different from all other indexes) and $sum_j=\sum\limits_{i\in{P^j}} sd_i$. 
+  At this point there will be the same pairs as before in addition of $\sqrt{N}$ pairs representing the partial sum of squared distances.
+
+**Round 3**
+Compute sum of distances
+
+- *Map*: identity.
+- *Reduce*: gather by key and leave unaltered all subsets, aside from the one with all the pairs of key $n$. Reduce that set in a single pair $(n, \sum\limits_{j=0}^{\sqrt{N}} sum_j)$ which represent the final sum of squared distances for all points in $P\setminus S$.
+  At this point there are $N-m+1$ pairs, one for each point in $P\setminus S$ plus the total sum.
+
+**Round 4**
+Compute probability
+
+- *Map*: map each pair dividing by the total sum of squared distances, producing the final probability: $(i,(x_i, sd_i)) \longrightarrow (i, (x_i, \cfrac{sd_i}{sum}))$.
+- *Reduce*: identity function.
+
+**Analysis**
+The algorithm uses 4 rounds, and each round needs a maximum of $\sqrt{N}$ pairs at the same time so $M_L=O(\sqrt{N})$. Reduce phase on round 1 has to deal with $N$ pairs overall, so $M_A=O(N)​$. 
+
+#### Kmeans++
+
+The following MapReduce procedure represent how to obtain center $c_n​$ for iteration $n​$ of *kmeans++*. Running this procedure $k​$ times every time with the updated set of centers $S​$ allows to obtain $k​$ center.
 
 **Round 1**
 
-- Map: $(ID, x_i) \longrightarrow (d_{ij},x_i)$ where $d_{ji}=d_{ij}=\max{\{i,j\}}+\min{\{i,j\}}\cdot N$.
-- Reduce:
+- *Map*: $(i, x_i) \longrightarrow (i\mod \sqrt{N}, x_i)$.
+- *Reduce*: gather by key the subsets $P^j$ where $|P^j|\le \sqrt{N}~\forall~j$ such that $0\le j < \sqrt{N}$ and compute $\pi_i=Probability(P^j, S)$ for each pair in subset: $(i, x_i) \longrightarrow (i, (x_i, \pi_i))$
+  Note that $\forall j\in[0, \sqrt{N})~~~\sum\limits_{i\in P^j}\pi_i=1$ so $\pi_i$ define a probability distribution, as required.
+
+**Round 2**
+
+- *Map* : identity.
+
+- *Reduce*: gather by key the at most $\sqrt{N}$ pairs and produce a single pair representing the selected center in subset $P^j$ chosen with probability calculated in previous round: $ (i, (x_i, \pi_i)) ~\forall i \in P^j \longrightarrow (i, x_i)$.
+
+  Note that the produced pair represent the chosen center between points in $P^j​$ and it's not yet a center of $P​$. To do that we need another round.
+  At this point there will be at most $\sqrt{N}​$ pairs in total with keys $\in [0, \sqrt{N})​$.
+
+**Round 3**
+
+- *Map*: for each of the $\sqrt{N}$ pairs (lets call the whole subset $P^{ref}$) and compute $\pi_i=Probability(P^{ref}, S)$ mapping each pair to its probability of being a final center: $(i, x_i )\longrightarrow (0, (x_i, \pi_i))$.
+- *Reduce*: reduce the $\sqrt{N}$ pairs to a single pair $(0, x_i)$ choosing each pair from the set with probability computed in map phase.
+
+**Analysis**
+
+Clearly only $\sqrt{N}$ pairs need to be stored in memory every time so $M_L=O(\sqrt{N})$ and there are $\sqrt{N}$ subsets of $\sqrt{N}$ pairs so $M_A=O(N)$. This analysis assumes that $Probability(P,S)$ runs efficiently in a constant number of rounds, as stated before.
+Repeating this procedure $k$ times results in the complete *kmeans++* algorithm with $3*k = O(k)$ rounds.
+
+
 
 ## Exercise 2 pag 20
 
@@ -30,6 +104,8 @@ Show how to implement one iteration of Lloyd’s algorithm in MapReduce using a 
 ### Solution
 
 To do.
+
+
 
 ## Exercise 3 pag 47
 
@@ -50,7 +126,9 @@ $1-Pr(\phi_{kmeans}(\mathcal{C}_{alg})\ge \alpha\cdot \phi^{opt}_{kmeans}(k)) \s
 
 So putting the pieces together we have  $Pr (\phi_{kmeans}(\mathcal{C}_{alg} ) ≤ \alpha · \phi^{opt}_{kmeans}(k)) \ge 1-\cfrac{8(ln(k)+2)}{\alpha}$
 And we want the quantity on the right to be  $\ge \cfrac{1}{2}$. Thus we want $\cfrac{8(ln(k)+2)}{\alpha} \le \cfrac{1}{2}$.
-Solving the inequality we see that the bound is true with any  $\alpha \ge 16(\ln{k}+2)​$.
+Solving the inequality we see that the bound is true with any  $\alpha \ge 16(\ln{k}+2)$.
+
+
 
 ## Exercise 4 pag 48
 
@@ -63,13 +141,15 @@ Show that the same approximation ratio, but with probability at least $1 − 1/N
 
 ### Solution $\checkmark$
 
-Suppose we run a certain number of consecutive *k-means++* and partitioning and each time we test whether the objective function $\phi_{kmeans}​$ respect the inequality  $\phi_{kmeans} (\mathcal{C}_{alg}) ≤ \alpha · \phi^{opt}_{kmeans}(k)​$, for a known $\alpha >1​$. At every run we save the objective function and update $\mathcal{C}_{best}=argmin~\phi(\mathcal{C}_i)​$, the best clustering found. Every run is independent from the other as long as the first point is selected at random every time.
-We define a random variable $Y=0 \iff​$ the inequality is not respected and 1 otherwise. The probability to have a 1 is $\ge 1/2​$.
-This defines a Bernoulli distribution $Ber(p\ge1/2)​$.
-Define then a random variable $X=​$("number of $Y=1​$ in a series of $M​$ trials"). This defines a binomial distribution $Bin(M,p\ge\frac{1}{2})​$.
+Suppose we run a certain number of consecutive *k-means++* and partitioning and each time we test whether the objective function $\phi_{kmeans}$ respect the inequality  $\phi_{kmeans} (\mathcal{C}_{alg}) ≤ \alpha · \phi^{opt}_{kmeans}(k)$, for a known $\alpha >1$. At every run we save the objective function and update $\mathcal{C}_{best}=argmin~\phi(\mathcal{C}_i)$, the best clustering found. Every run is independent from the other as long as the first point is selected at random every time.
+We define a random variable $Y=0 \iff$ the inequality is not respected and 1 otherwise. The probability to have a 1 is $\ge 1/2$.
+This defines a Bernoulli distribution $Ber(p\ge1/2)$.
+Define then a random variable $X=$("number of $Y=1$ in a series of $M$ trials"). This defines a binomial distribution $Bin(M,p\ge\frac{1}{2})$.
 Since at every run of *k-means++* we save the best clustering we need just one run to satisfy the inequality to prove the bound.
-Then $Pr(X\ge 1) = 1-Pr(X=0)\ge 1-\binom{M}{0}\cdot(\frac{1}{2})^0\cdot(1-\frac{1}{2})^M=1-\cfrac{1}{2^M}​$.
-So with at least $M=\lceil\log_2{N}\rceil​$ trials the bound is satisfied with probability $\ge 1-\cfrac{1}{N}​$.
+Then $Pr(X\ge 1) = 1-Pr(X=0)\ge 1-\binom{M}{0}\cdot(\frac{1}{2})^0\cdot(1-\frac{1}{2})^M=1-\cfrac{1}{2^M}$.
+So with at least $M=\lceil\log_2{N}\rceil$ trials the bound is satisfied with probability $\ge 1-\cfrac{1}{N}$.
+
+
 
 ## Exercise 5 pg 48
 
@@ -81,7 +161,7 @@ Show that the *PAM* algorithm always terminates.
 
 **PAM Algorithm pseudocode**
 
-Input: Set $P$ of $ N$ points from $\R^D$ , integer $k > 1$
+Input: Set $P$ of $ N$ points from $(M,d)$, integer $k > 1$
 Output: *k-clustering* $C = (C_1 , C_2 , . . . , C_k ; c_1 , c_2 , . . . , c_k )$ of $P$ with small $\phi_{kmedian}(C)$ 
 
 $ S ← \{c_1 , c_2 , . . . , c_k\}​$ (arbitrary set of $k​$ points of $P​$)
@@ -100,6 +180,6 @@ while ($!​$stopping-condition​) do
 return $ C​$
 
 **Reason why it stops**
-At any moment the function $\phi(\mathcal{C})$ is the minimum value of objective function for *k-median* encountered to that moment. At every iteration the two for each loops consider all possible clustering over all possible combination of points. If inside these loops is not possible to find a better solution than the current optimal, the algorithm will never enter the inner *if* and the *stopping-condition* will remain set to $true$.
-Additionally the value of the $\phi_{kmedian} (C)$ must decrease in every iteration to allow the algorithm to do another *while* iteration, since the *if* statement requires a strict inequality to set *stopping-condition* to $false​$.
+At any moment the function $\phi(\mathcal{C})​$ is the minimum value of objective function for *k-median* encountered to that moment. At every iteration the two for each loops consider all possible clustering over all possible combination of points. If inside these loops is not possible to find a better solution than the current optimal, the algorithm will never enter the inner *if* and the *stopping-condition* will remain set to $true​$.
+Additionally the value of the $\phi_{kmedian} (C)​$ must decrease in every iteration to allow the algorithm to do another *while* iteration, since the *if* statement requires a strict inequality to set *stopping-condition* to $false​$.
 Thus the PAM algorithm surely stops.
