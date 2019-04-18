@@ -8,44 +8,42 @@
 
 ### Description
 
-Show that by setting $t ∈ o(N)$, $H(P)​$ can be efficiently computed in *MapReduce*.
+Show that by setting $t ∈ o(N)$, $H(P)$ (Hopkins statistic) can be efficiently computed in *MapReduce*.
 
 ### Solution
 
-Input: $N$ pairs in the form $(i, (p_i, f))$ where $i$ is a unique integer $1 \le i < N$ and:
+Input: $N$ pairs in the form $(i, (p_i, f))$ where $i$ is a unique integer $1 \le i < N$ and
 
-- $f=1 \iff p_i\in X$, $X=\{x_0,x_1,...x_{t-1}\}$
+- $f=1 \iff p_i\in X​$, $X=\{x_0,x_1,...x_{t-1}\}​$
 - $f=2 \iff p_i\in Y​$, $Y=\{y_0,y_1,...y_{t-1}\}​$
-- $f=0 \iff p_i\in P\setminus X​$.
+- $f=0 \iff p_i\in P\setminus X$
 
 **Round 1**
 
-- Map: map each pair with $f=0​$ in $t​$ different pairs $(t\cdot j +(i\mod{t}), (d(x_j, p_i),d(y_j,p_i)))~\forall~j\in [0,t)​$.
-  Now we have the distance between each point in $X​$ and $Y​$ and each point in $P​$.
+- *Map*: map each pair with $f=0​$ in $t​$ different pairs $(t\cdot j +(i\mod{t}), (d(x_j, p_i),d(y_j,p_i)))~\forall~j\in [0,t)​$.
+  Now we have the distance between each point in $X​$ and $Y​$ and each point in $P​$ and $N\cdot t​$ pairs.
 
-  // Create $t$ copies of each pair with $f=1$: $(i, x_i, 1) \longrightarrow (i\cdot t+k, (x_i,1))~\forall~k\in[0,t)$. NOT NEEDED
-  // Create $t$ copies of each pair with $f=2: (i, y_i,2) \longrightarrow (i\cdot t+k, (y_i,2))~\forall~k\in[0,t)$. NOT NEEDED
-
-- Reduce: gather by key every subset $P^j​$ and produce a single pair $(k, (d_{min}(x_j), d_{min}(y_j)))​$, where $d_{min}(x_j)=d(x_j,P^j\setminus \{x_i\})=\min{\{d(x_j,p_i)~~\forall~p_i\in P^j\setminus \{x_i\}\}}​$. Note that $|P^j|\le t​$.
+- *Reduce*: gather by key every subset $P^j​$ and produce a single pair $(k, (d_{min}(x_j), d_{min}(y_j)))​$, where $d_{min}(x_i)=d(x_i,P^j\setminus \{x_i\})=\min{\{d(x_i,p_i)~~\forall~p_i\in P^j\setminus \{x_i\}\}}​$ and $d_{min}(y_i)=d(y_i,P^j\setminus \{y_i\})=\min{\{d(y_i,p_i)~~\forall~p_i\in P^j\setminus \{x_i\}\}}​$.
+  Note that $|P^j|\le t​$.
 
 **Round 2**
+At this point we have $t$ sets of $t​$ pairs.
 
-At this point we have $t​$ sets of $t​$ pairs.
-
-- Map: map each pair in $(k \div t, (d_{min}(x_j), d_{min}(y_j))$ where $\div$ is the integer division.
-- Reduce: gather by key the at most $t$ pairs and produce a single pair with the minimum distance for both $x_j$ and $y_j$:  $(k, (d(x_j,P\setminus \{x_j\}), d(y_j,P\setminus \{y_j\})))=(k, (w_j, u_j))$.
+- *Map*: map each pair in $(k \div t, (d_{min}(x_j), d_{min}(y_j))​$ where $\div​$ is the integer division.
+- *Reduce*: gather by key the at most $t​$ pairs and produce a single pair with the minimum distance for both $x_j​$ and $y_j​$:  $(k, (d(x_j,P\setminus \{x_j\}), d(y_j,P\setminus \{y_j\})))=(k, (w_j, u_j))​$.
 
 **Round 3**
-
 Now we have $t$ pairs containing the distance between each point in $X$ and $P$ and between each point in $Y$ and $P$. All we have to do is to sum these components and compute $H(P)$.
 
-- Map: Identity.
+- Map: identity.
 - Reduce: gather all the pairs and produce a single pair $\left (0, \dfrac{\sum\limits_{j=0}^{t-1}u_i}{\sum\limits_{j=0}^{t-1}u_i+\sum\limits_{j=0}^{t-1}w_i}\right)$.
 
 **Analysis**
 
 At each round the input is at most $t$ pairs. So $M_L=O(t)$ and aggregate space $O(t\cdot N)$ since totally we have $t$ sets of $N/t$ pairs, each set replicated $t$ times.
 Setting $t=o(N)$, like $t=\sqrt{N}$ ensures good solution.
+
+
 
 ## Exercise 2 pag 13
 
@@ -60,5 +58,5 @@ Let $P$ be a pointset of $N$ points in a metric space $(M, d)$ and let $C ⊆ P$
 
 ### Solution
 
-
+- Map: map the points of $C$ with a random value in $[0,1]$ with uniform probability: $(ID \mod \sqrt{n}, (x_i, p))$ where $p$ is the random number
 
