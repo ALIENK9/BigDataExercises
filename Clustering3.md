@@ -61,8 +61,9 @@ Let $P$ be a pointset of $N$ points in a metric space $(M, d)$ and let $C ⊆ P$
 **Round 1**
 
 - *Map*: extract for each point in $C$ a number in $\{0,1\}$ where $p(1) =\cfrac{t}{n}$. If the extracted number is $0$ discard the pair, otherwise keep it.
-  Note that, on average, only $t$ pairs will be kept. Then map each of the extracted point in this way: $(i, x_i) \longrightarrow (i, d(p, x_i))$, where $i$ is an index in $\{1, t\}$ and $d$ is the distance function.
-
+  Note that, on average, only $t$ pairs will be kept (it's a binomial distribution with expectation $n\cdot \cfrac{t}{n} = t$).
+Then map each of the extracted point in this way: $(i, x_i) \longrightarrow (i, d(p, x_i))$, where $i$ is an index in $\{1, t\}$ and $d$ is the distance function.
+  
 - *Reduce*: gather all the pairs, which are at most $O(t)=O(\log N)$, and compute the weighted sum obtaining a single pair $(0, \cfrac{n}{t}\sum\limits_{i=1}^t d(p, x_i))$.
 
 **Analysis**
