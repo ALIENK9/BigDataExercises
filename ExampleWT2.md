@@ -38,7 +38,7 @@ If the stopping criteria is not yet met, for each point $p$ in the point set exc
 
 ### Solution
 
-
+GIGI
 
 ## Exercise 1
 
