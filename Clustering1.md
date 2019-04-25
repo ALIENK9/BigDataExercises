@@ -78,18 +78,22 @@ Distances is a structure where $D[i].closest​$ returns the closest center to p
 
 ### Description
 
-Let $P$ be a set of points in a metric space $(M, d)$, and let $T ⊆ P$. 
-For any $k < |T |, |P|$, show that  $\phi^{opt}_{kcenter}(T , k) ≤ 2\phi^{opt}_{kcenter} (P, k)$. Is the bound tight?
+Let $P​$ be a set of points in a metric space $(M, d)​$, and let $T ⊆ P​$. 
+For any $k < |T |, |P|​$, show that  $\phi^{opt}_{kcenter}(T , k) ≤ 2\phi^{opt}_{kcenter} (P, k)​$. Is the bound tight?
 
 ### Solution
 
-Boh.
+Let $|k| + 1$ points {$c_1,c_2, ... , c_k, q$} $⊆ P$ called $T$  where $c_1,c_2, ... , c_k$ are the centers,  q is the external point. For each distinct pair of points in this set, with one of the is equal to $q$, $d(x,y) ≥ \phi^{opt}_{kcenter}(T , k)$ , the inequality stand for $\phi^{opt}_{kcenter}$ definition. Calling $c$ a center of $\phi^{opt}_{kcenter} (P, k)$, then $\phi^{opt}_{kcenter}(T,k) ≤ d(x,y) ≤ d(x,c) + d(c,y)$ for the triangular inequality. Since c is a center of $\phi^{opt}_{kcenter} (P, k)$, $d(x,c) , d(c,y) ≤ \phi^{opt}_{kcenter} (P, k)$ therefore $\phi^{opt}_{kcenter}(T,K) ≤ \phi^{opt}_{kcenter} (P, k) + \phi^{opt}_{kcenter} (P, k) ≤  2\phi^{opt}_{kcenter} (P, k)$.
+
+Mah, non sono affatto sicuro.
 
 ## Exercise 5 pag 51
 
+
+
 ### Description
 
-Let $P$ be a set of $N$ points in a metric space $(M, d)$, and let $C = (C_1 , C_2 , . . . , C_k ; c_1 , c_2 , . . . , c_k)$ be a k-clustering of $P$. Initially, each point $q ∈ P$ is represented by a pair $(ID(q), (q, c(q)))$, where $ID(q)$ is a distinct key in $[0, N − 1]$ and $c(q) ∈ \{c_1 , . . . , c_k\}$ is the center of the cluster of $q$.
+Let $P​$ be a set of $N​$ points in a metric space $(M, d)​$, and let $C = (C_1 , C_2 , . . . , C_k ; c_1 , c_2 , . . . , c_k)​$ be a k-clustering of $P​$. Initially, each point $q ∈ P​$ is represented by a pair $(ID(q), (q, c(q)))​$, where $ID(q)​$ is a distinct key in $[0, N − 1]​$ and $c(q) ∈ \{c_1 , . . . , c_k\}​$ is the center of the cluster of $q​$.
 
 1. Design a 2-round *MapReduce* algorithm that for each cluster center $c_i​$ determines the most distant point among those belonging to the cluster $C_i​$ (ties can be broken arbitrarily).
 2. Analyze the local and aggregate space required by your algorithm. Your algorithm must require $o(N)$ local space and $O (N)$ aggregate space.
