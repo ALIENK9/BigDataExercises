@@ -14,10 +14,10 @@ Usually, the execution of a MapReduce application involves a master and several 
 
 At the beginning of a MapReduce computation several processes are created:
 
-- A single *master* process which has the responsibility of assigning tasks top the worker processes.
+- A single *master* process which has the responsibility of assigning tasks to the worker processes.
 - Several *workers* processes, that execute the map and reduce operations. Every worker process can be *idle*, *in-progress* and *completed*.
 
-The master process has also to monitor the progress of the workers, thus, if a worker fails, master has to reschedule that task.
+Furthermore the master process has to monitor the progress of the workers, thus, if a worker fails, master has to reschedule that task.
 
 
 
@@ -33,7 +33,7 @@ With reference to the k-means clustering problem:
 1. Classical Lloyd's algorithm starts with $k$ centers selected randomly fro the set of points and iteratively assign every point to the closest center and then computes the new centers of each cluster. It stops when there is no substantial change in the value of k-means objective function from the previous iteration.
    While the algorithm always terminates it can do quite a lot of iterations before stopping. It can be proved a lower bound on the number of iteration as $2^{\Omega(\sqrt{N})}$ in the worst case. When $k$ and $D$ (dimensionality of input space) are small it has been proven an upper bound of $O(N^{kD})$.
    Aside from the number of iterations the main drawback of Lloyd's algorithm is its inability to always converge to the optimal solution, since it can stop on a local optimum, whose value of objective function can be larger than the real optimum.
-2. The quality of Lloyd's algorithm's solution and speed of convergence strongly depends on the choice of the initial set of centers. K-means++ is a initialization procedure that returns the $k$ centers not too far from the optimal ones. It iterates $k$ times and each time it selects a point (as center) from the point in set $P$ choosing each point with probability proportional to the distance of the point from the rest of centers. Lloyd's algorithm can then improve the solution.
+2. The quality of Lloyd's algorithm's solution and speed of convergence strongly depend on the choice of the initial set of centers. K-means++ is an initialization procedure that returns the $k$ centers not too far from the optimal ones. It iterates $k$ times and each time it selects a point (as center) from the point in set $P$ choosing each point with probability proportional to the distance of the point from the rest of centers. Lloyd's algorithm can then improve the solution.
 
 
 
@@ -72,7 +72,7 @@ Let $P$ be a set of $N$ bi-colored points from a metric space, partitioned into 
 
 - *Map*: $(ID_x , (x, i_x , γ_x)) \longrightarrow (ID_x \mod \sqrt{N}, (x, i_x, \gamma_x))$
 - *Reduce*: gather by key the at most $\sqrt{N}$ pairs in each subset $P^j$ and for each point in the same cluster $i$ produce a single pair $(i, p_i)$ where $p_i=\begin{cases}~~~0\iff \gamma_x=0~\forall~x\in P^j_i\\~~~1 \iff \gamma_x=1~\forall~x\in P^j_i\\ -1 \iff \exists x\in P^j_i,~\exists y\in P^j_i.(x\ne y~\and~\gamma_x \ne \gamma_y)\end{cases}$ where $P_i^j$ is the subset of points in $P^j$ belonging to the same cluster $i$.
-  Note that after this phase there will be at most $\sqrt{N}$ points with each key $i$ for $1 ≤ i ≤ k$ (since every subset yields at most a pair with key $i$).
+  Note that after this phase there will be at most $\sqrt{N}$ points with (for?) each key $i$ for $1 ≤ i ≤ k$ (since every subset yields at most a pair with key $i$).
 
 **Round 2**
 
