@@ -83,9 +83,11 @@ For any $k < |T |, |P|​$, show that  $\phi^{opt}_{kcenter}(T , k) ≤ 2\phi^{o
 
 ### Solution
 
-Let $|k| + 1​$ points {$c_1,c_2, ... , c_k, q​$} $⊆ P​$ called $T​$  where $c_1,c_2, ... , c_k​$ are the centers,  q is the external point. For each distinct pair of points in this set, with one of the is equal to $q​$, $d(x,y) = \phi^{opt}_{kcenter}(T , k)​$ , the inequality stand for $\phi^{opt}_{kcenter}​$ definition, whereas if both are the chosen points are centers, than the inequality $d(x,y) ≥ \phi^{opt}_{kcenter}(T , k)​$ stands because otherwise it could be possible to obtain a better clustering by choosing $q​$ as a center, and group $x​$ and $y​$ in the same cluster. Therefore for every distinct pair in $T​$, $d(x,y) ≥ \phi^{opt}_{kcenter}(T , k)​$.
+Let $|k| + 1$ points {$c_1,c_2, ... , c_k, q$} $⊆ P$ called $T$  where $c_1,c_2, ... , c_k$ are the centers,  q is the external point. For each distinct pair of points in this set, with one of the is equal to $q$, $d(x,y) = \phi^{opt}_{kcenter}(T , k)$ , the inequality stand for $\phi^{opt}_{kcenter}$ definition, whereas if both are the chosen points are centers, than the inequality $d(x,y) ≥ \phi^{opt}_{kcenter}(T , k)$ stands because otherwise it could be possible to obtain a better clustering by choosing $q$ as a center, and group $x$ and $y$ in the same cluster. Therefore for every distinct pair in $T$, $d(x,y) ≥ \phi^{opt}_{kcenter}(T , k)$.
 
 Since $T$ is composed of more than $k$ points, at least two of them ($x,y$), must belong to the same cluster of  $\phi^{opt}_{kcenter} (P, k)$, lets be $c$ the center of this cluster, then $\phi^{opt}_{kcenter}(T,k) ≤ d(x,y) ≤ d(x,c) + d(c,y)$ for the triangular inequality. Since c is a center of $\phi^{opt}_{kcenter} (P, k)$: $d(x,c) , d(c,y) ≤ \phi^{opt}_{kcenter} (P, k)$ therefore $\phi^{opt}_{kcenter}(T,K) ≤ \phi^{opt}_{kcenter} (P, k) + \phi^{opt}_{kcenter} (P, k) ≤  2\phi^{opt}_{kcenter} (P, k)$.
+
+The bound is tight, for example $P$ with three points: $a,b,m$. Where $m$ is the mean point of the other two, and $k$ equal to one. The optimal cluster use $m$ as the center, and $\phi^{opt}_{kcenter} (P, k) = d(a,b)/2$. Given set           $T$ = ​{$a,b$}, $\phi^{opt}_{kcenter}(T , k) = d(a,b)$ with either $a$ or $b$ as centers. Therefore in this particular case $\phi^{opt}_{kcenter}(T , k) = 2\phi^{opt}_{kcenter} (P, k)$, so no bound can be tighter.
 
 ## Exercise 5 pag 51
 
