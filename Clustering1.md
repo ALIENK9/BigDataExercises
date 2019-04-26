@@ -150,7 +150,7 @@ Then the optimal cluster uses $m$ as the center, and $\phi^{opt}_{kcenter} (P, k
 
 ### Description
 
-Let $P​$ be a set of $N​$ points in a metric space $(M, d)​$, and let $C = (C_1 , C_2 , . . . , C_k ; c_1 , c_2 , . . . , c_k)​$ be a k-clustering of $P​$. Initially, each point $q ∈ P​$ is represented by a pair $(ID(q), (q, c(q)))​$, where $ID(q)​$ is a distinct key in $[0, N − 1]​$ and $c(q) ∈ \{c_1 , . . . , c_k\}​$ is the center of the cluster of $q​$.
+Let $P$ be a set of $N$ points in a metric space $(M, d)$, and let $C = (C_1 , C_2 , . . . , C_k ; c_1 , c_2 , . . . , c_k)$ be a k-clustering of $P$. Initially, each point $q ∈ P$ is represented by a pair $(ID(q), (q, c(q)))$, where $ID(q)$ is a distinct key in $[0, N − 1]$ and $c(q) ∈ \{c_1 , . . . , c_k\}$ is the center of the cluster of $q$.
 
 1. Design a 2-round *MapReduce* algorithm that for each cluster center $c_i​$ determines the most distant point among those belonging to the cluster $C_i​$ (ties can be broken arbitrarily).
 2. Analyze the local and aggregate space required by your algorithm. Your algorithm must require $o(N)$ local space and $O (N)$ aggregate space.
@@ -158,17 +158,28 @@ Let $P​$ be a set of $N​$ points in a metric space $(M, d)​$, and let $C =
 ### Solution
 
 **Round 1**
-- *Map*: map each point $(ID(q), (q, c(q))) \longrightarrow (ID(q)\mod\sqrt{N}, (q,c(q)))​$.
-- *Reduce*: gather by key the subsets $P^j​$ and for each different $c(q)​$ produce the pair $(c(q_j), (q_j, d(c(q_j),q_j)))​$ where $q_j=\arg\!\max_{q_j}\{d(c(q_j),q_j)~~\forall~q_j\in P^j\}​$.
-Note that new key $c(q_j) \in [1, k]​$ and each subset $P^j​$ produces at most one pair with key $c(q_j)​$. Since we have $\sqrt{N}​$ subset after this phase there are at most $\sqrt{N}​$ element with same key.
+- *Map*:
+
+  - Map each point $(ID(q), (q, c(q))) \longrightarrow (ID(q)\mod\sqrt{N}, (q,c(q)))$.
+
+- *Reduce*:
+
+  - Gather by key the subsets $P^j$ and for each different $c(q)$ produce the pair $(c(q_j), (q_j, d(c(q_j),q_j)))$ where $q_j=\arg\!\max_{q_j}\{d(c(q_j),q_j)~~\forall~q_j\in P^j\}​$.
+
+    Note that new key $c(q_j) \in [1, k]$ and each subset $P^j$ produces at most one pair with key $c(q_j)$. Since we have $\sqrt{N}$ subset after this phase there are at most $\sqrt{N}$ element with same key.
 
 **Round 2**
 
-- *Map*: identity.
-- *Reduce*: gather by key the at most $\sqrt{N}​$ pairs in the form $(c(q), (q, d(c(q),q)))​$ and for each subset $P^k​$ and produce the pair $(c(q_{max}), q_{max})​$ where $q_{max}=\arg\!\max_{q} \{d(c(q), q)~~\forall~q\in P^k\}​$.
+- *Map*:
+  - Identity.
+- *Reduce*:
+  - Gather by key the at most $\sqrt{N}$ pairs in the form $(c(q), (q, d(c(q),q)))​$;
+  - For each subset $P^k$ produce the pair $(c(q_{max}), q_{max})$ where $q_{max}=\arg\!\max_{q} \{d(c(q), q)~~\forall~q\in P^k\}$.
 
 **Analysis**
-At each round at most  $\sqrt{N}$ pairs are kept in the same subset so $M_L=O(\sqrt{N})$. First reduce phase has to deal with $\sqrt{N}$ subsets of $\sqrt{N}$ pairs each, so $M_A=O(N)$. Clearly $M_L \in o(N)$ as required.
+At each round at most  $\sqrt{N}$ pairs are kept in the same subset so $M_L=O(\sqrt{N})$. Clearly $M_L \in o(N)$ as required.
+
+The first reduce phase has to deal with $\sqrt{N}$ subsets of $\sqrt{N}$ pairs each, so $M_A=O(N)$. 
 
 
 
@@ -179,28 +190,42 @@ At each round at most  $\sqrt{N}$ pairs are kept in the same subset so $M_L=O(\s
 Let $P$ be a set of $N$ bi-colored points, partitioned in $k$ clusters $C_1,C_2,...,C_k$. Design a 2 round algorithm in MR to check whether every cluster $C_i$ is solid (i.e. whether a cluster contains all points of the same color).
 Analyze the local and aggregate space required by your algorithm. Your algorithm must require $o(N)$ local space and $O(N)$ aggregate space.
 
-Input: $\{(ID_x, (x,i_x,\gamma_x))~~~\forall x\in P\}​$.
-Where $ID_x\in [0,N)​$, $i_x \in[1,k]​$ is the index of the cluster a point belongs to, $\gamma_x\in \{0,1\}​$ is the color.
+* **Input**: $\{(ID_x, (x,i_x,\gamma_x))~~~\forall x\in P\}$. Where:
+  * $ID_x\in [0,N)$;
+  * $i_x \in[1,k]$ is the index of the cluster a point belongs to;
+  * $\gamma_x\in \{0,1\}​$ is the color.
 
-Output: $\{(i,b_i)~~~\forall~1 \le i \le k\}​$.
-Where $b_i=\begin{cases}
--1 \iff \text{there exist two points $\in C_i$ with different color}\\~~~0 \iff \text{every point $\in C_i$ have color 0}\\~~~1 \iff \text{every point $\in C_j$ have color 1} \end{cases}​$ 
+* **Output**: $\{(i,b_i)~~~\forall~1 \le i \le k\}​$. Where:
+  *  $b_i=\begin{cases}
+    -1 \iff \text{there exist two points $\in C_i$ with different color}\\~~~0 \iff \text{every point $\in C_i$ have color 0}\\~~~1 \iff \text{every point $\in C_j$ have color 1} \end{cases}$ 
 
 ### Solution $\checkmark$
 
 **Round 1**
 
-- *Map*: $(ID_x, (x,i_x,\gamma_x)) \longrightarrow (ID_x\mod \sqrt{N}, (x,i_x,\gamma_x))$.
-- *Reduce*: $\forall~\ell \in [0,\sqrt{N})$ gather by key pairs $(\ell, (x,i_x,\gamma_x))$. Considering each partition $\ell$, reduce the pairs belonging to the same cluster $C_j = \{\text{pairs with}~i_x=j\}$ to a single pair $(j, b_j(\ell))$, where
-  $b_j(\ell)=\begin{cases}
-  -1 \iff \text{points of $C_j$ in partition $\ell$ have different color}\\~~~0 \iff \text{every point of $C_j$ in partition $\ell$ have color 0}\\~~~1 \iff \text{every point of $C_j$ in partition $\ell$ have color 1} \end{cases}$
-  Note that reduce phase produce at most $\sqrt{N}$ pairs for each cluster (with same key $j$).
+- *Map*:
+
+  - $(ID_x, (x,i_x,\gamma_x)) \longrightarrow (ID_x\mod \sqrt{N}, (x,i_x,\gamma_x))$.
+
+- *Reduce*: 
+
+  - $\forall~\ell \in [0,\sqrt{N})$ gather by key pairs $(\ell, (x,i_x,\gamma_x))$.
+
+  - Considering each partition $\ell$, reduce the pairs belonging to the same cluster $C_j = \{\text{pairs with}~i_x=j\}$ to a single pair $(j, b_j(\ell))$, where:
+
+    $b_j(\ell)=\begin{cases}
+    -1 \iff \text{points of $C_j$ in partition $\ell$ have different color}\\~~~0 \iff \text{every point of $C_j$ in partition $\ell$ have color 0}\\~~~1 \iff \text{every point of $C_j$ in partition $\ell$ have color 1} \end{cases}$
+
+    Note that reduce phase produce at most $\sqrt{N}$ pairs for each cluster (with same key $j$).
 
 **Round 2**
 
-- *Map*: identity
-- *Reduce*: $\forall~1\le j \le k​$  gather the at most $\sqrt{N}​$ pairs $(j, b_j(\ell))​$ with $0 \le \ell < \sqrt{N}​$ and output the pair $(j, b_j)​$ where $b_j=\begin{cases}
-  -1\iff \exists~\ell' \and \ell''.(b_j(\ell')=0~\and~b_j(\ell'')=1)\\~~~0 \iff \forall~\ell.b_j(\ell)=0\\~~~1 \iff \forall~\ell.b_j(\ell)=1 \end{cases}​$
+- *Map*:
+  - Identity
+- *Reduce*:
+  - $\forall~1\le j \le k$  gather the at most $\sqrt{N}$ pairs $(j, b_j(\ell))$ with $0 \le \ell < \sqrt{N}$ ;
+  - Output the pair $(j, b_j)$ where $b_j=\begin{cases}
+    -1\iff \exists~\ell' \and \ell''.(b_j(\ell')=0~\and~b_j(\ell'')=1)\\~~~0 \iff \forall~\ell.b_j(\ell)=0\\~~~1 \iff \forall~\ell.b_j(\ell)=1 \end{cases}$
 
 **Analysis**
-Input pairs for any phase are at most $\sqrt{N}$, so  $M_L=O(\sqrt{N})=o(N)$ and we have to process $\sqrt{N}$ partitions of $\sqrt{N}$ pairs each, thus $M_A=O(N)$.
+Input pairs for any phase are at most $\sqrt{N}​$, so  $M_L=O(\sqrt{N})=o(N)​$ and we have to process $\sqrt{N}​$ partitions of $\sqrt{N}​$ pairs each, thus $M_A=O(N)​$.
