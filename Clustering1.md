@@ -10,7 +10,7 @@
 
 Let $|P| = N$ and suppose that each point $x ∈ P$ is represented as a key-value pair $(ID_x , (x, f ))$, where:
 
-* $ID_x​$ is a distinct integer in $[0, N)​$, and
+* $ID_x$ is a distinct integer in $[0, N)$, and
 * $f$ is a binary flag which is $1$ if $x ∈ S$ and $0$ otherwise.
 
 Design a 1-round *MapReduce* algorithm that implements $Partition(P, S)$ with:
@@ -18,7 +18,7 @@ Design a 1-round *MapReduce* algorithm that implements $Partition(P, S)$ with:
 * $M_L = O (k)$;
 * $M_A = O (N)$.
 
-(Assume that $k​$ and $N​$ are known).
+(Assume that $k$ and $N$ are known).
 
 ### Solution
 
@@ -26,7 +26,7 @@ Partition algorithm to perform clustering from a set $S$ of $k$ centers and a se
 
 **Partition(P, S)**
 
-Let $S = {c_1 , c_2 , . . . , c_k } ⊆ P​$
+Let $S = {c_1 , c_2 , . . . , c_k } ⊆ P$
 
 *for*  $i ← 1$   *to*   $k$  *do*  $C_i ← {c_i}$ 	*// Initialize each cluster with its center*
 *for* *each*  $p ∈ P \setminus S$  *do*	    	 *// For each point that is not a center* 
@@ -44,7 +44,7 @@ The map reduce algorithm is the following:
 
 - *Map*: 
   - Map each point $x \in P\setminus S$ in $k$ different pairs representing the distance between $x$ and each of the $k$ different centers. This means:  $(ID_x , (x, f=0)) \longrightarrow (ID_x, (x, c_i, d(x,c_i)))~~~\forall i\in1..k$;
-  - Add $k$ pairs $(ID_{c_i}, (c_i,c_i,0))$ one for each of the centers $c_i~\forall i\in1..k$  (distance is obviously $0$  because a center is at distance $0​$ from itself);
+  - Add $k$ pairs $(ID_{c_i}, (c_i,c_i,0))$ one for each of the centers $c_i~\forall i\in1..k$  (distance is obviously $0$  because a center is at distance $0$ from itself);
   - At the end of the round there will be $(N-k)\cdot k + k$ different pairs: $k$ pairs for each of the $N-k$ points that are not centers, plus one pair for each of the $k$ centers.
 - *Reduce*:
   - Gather by key $ID_x$, obtaining subsets of at most $k$ pairs each (precisely of either 1 or $k$ pairs);
@@ -52,11 +52,11 @@ The map reduce algorithm is the following:
 
 **Analysis**
 
-The size of the output of the map phase doesn't count in the analysis on $M_L​$, since the pairs need not to be stored in the memory of the worker in charge of this computation. 
+The size of the output of the map phase doesn't count in the analysis on $M_L$, since the pairs need not to be stored in the memory of the worker in charge of this computation. 
 
 For the reduce phase only $k$ pairs must be handled at the same time, thus $M_L=O(k)$.
 
-The reduce phase has to deal with $(N-k)\cdot k+k$ subsets of at most $k$ pairs so: $M_A=O(\cfrac{(N-k)\cdot k+k}{k})=O(N)$.
+The reduce phase has to deal with $(N-k)\cdot k+k$ pairs split into subsets of at most $k$ pairs so: $M_A=O(\cfrac{(N-k)\cdot k+k}{k}\cdot k)=O(Nk)$.
 
 
 
@@ -76,7 +76,7 @@ $S ← \{c_1\}$ 	// $c_1 ∈ P$ arbitrary point
 *for*  $i ← 2$  *to*  $k$  *do*
 	Find the point $c_i ∈ P \setminus S$ that maximizes $d(c_i, S)$
 	$S ← S ∪ \{c_i\}$
-*return* ​$Partition(P, S)$
+*return* $Partition(P, S)$
 
 Step of finding point not in $S$ that maximizes distance from set of centers at iteration $i$ would require computation of $(i-1) * (N-i+1)$ distances, one for each possible pair of points in $S$ and $P \setminus S$. This would take the following number of computations: 
 
@@ -124,27 +124,35 @@ Let $|k| + 1$ points be $T=\{c_1,c_2, ... , c_k, q\}⊆ P$ , where:
 
 For each distinct pair of points $(x,y)$ in this set: 
 
-* If $x=q \veebar y=q​$, then $d(x,y) = \phi^{opt}_{kcenter}(T , k)​$ and the inequality $d(x,y) ≥ \phi^{opt}_{kcenter}(T , k)​$  stands for $\phi^{opt}_{kcenter}​$ definition;
-* If both are the chosen points are centers, than the inequality $d(x,y) ≥ \phi^{opt}_{kcenter}(T , k)$ stands because otherwise it could be possible to obtain a better clustering by choosing $q$ as a center, and group $x$ and $y$ in the same cluster.
+* If $x=q \veebar y=q$, then $d(x,y) = \phi^{opt}_{kcenter}(T , k)$ and the inequality $d(x,y) ≥ \phi^{opt}_{kcenter}(T , k)$  holds for $\phi^{opt}_{kcenter}$ definition;
+* If both are the chosen points are centers, than the inequality $d(x,y) ≥ \phi^{opt}_{kcenter}(T , k)$ holds because otherwise it could be possible to obtain a better clustering by choosing $q$ as a center, and group $x$ and $y$ in the same cluster.
 
-Therefore for every distinct pair in $T$, $d(x,y) ≥ \phi^{opt}_{kcenter}(T , k)$.
+Therefore for every distinct pair $(x,y) \in T$,  $d(x,y) ≥ \phi^{opt}_{kcenter}(T , k)$.
 
-Since $T$ is composed of more than $k$ points, at least two of them (say $x, y$) must belong to the same cluster of  $\phi^{opt}_{kcenter} (P, k)$. Let $c$ be the center of this cluster, then, for the triangular inequality: 
+Since $T$ is composed of more than $k$ points, at least two of them (say $x, y$) must belong to the same cluster in the clustering resulting from the clustering procedure over $(P,k)$. In particular, they will belong to the same cluster in the optimal clustering (the one whose objective function value is $\phi^{opt}_{kcenter} (P, k)$). 
 
-$\phi^{opt}_{kcenter}(T,k) ≤ d(x,y) ≤ d(x,c) + d(c,y)​$ .
+Let $c$ be the center of cluster, then, for what stated above and for the triangular inequality: 
 
-Since $c​$ is a center of $\phi^{opt}_{kcenter} (P, k)​$:
+$\phi^{opt}_{kcenter}(T,k) ≤ d(x,y) ≤ d(x,c) + d(c,y)$ .
+
+Since $c$ is a center of $\phi^{opt}_{kcenter} (P, k)$:
 
 $d(x,c) , d(c,y) ≤ \phi^{opt}_{kcenter} (P, k)$.
 
-Therefore: $\phi^{opt}_{kcenter}(T,K) ≤ \phi^{opt}_{kcenter} (P, k) + \phi^{opt}_{kcenter} (P, k) ≤  2\phi^{opt}_{kcenter} (P, k)$.
+Therefore:
+
+$\phi^{opt}_{kcenter}(T,k) ≤ d(x,y) ≤ d(x,c) + d(c,y) ≤ \phi^{opt}_{kcenter} (P, k) + \phi^{opt}_{kcenter} (P, k) ≤  2\phi^{opt}_{kcenter} (P, k)$.
 
 Note that the bound is tight. For example, consider $P$ with three points: $a,b,m$, where:
 
 * $m$ is the mean point of $a, b$, and
 * $k=1$.
 
-Then the optimal cluster uses $m$ as the center, and $\phi^{opt}_{kcenter} (P, k) = d(a,b)/2$. Given set $T = \{a,b\}$, $\phi^{opt}_{kcenter}(T , k) = d(a,b)$ with either $a$ or $b$ as centers. Therefore in this particular case $\phi^{opt}_{kcenter}(T , k) = 2\phi^{opt}_{kcenter} (P, k)$, so no bound can be tighter.
+Then the optimal cluster uses $m$ as the center, and $\phi^{opt}_{kcenter} (P, k) = d(a,b)/2$. 
+
+Given set $T = \{a,b\}$, it holds that $\phi^{opt}_{kcenter}(T , k) = d(a,b)$ with either $a$ or $b$ as centers. 
+
+Therefore in this particular case $\phi^{opt}_{kcenter}(T , k) = 2\phi^{opt}_{kcenter} (P, k)$, so no bound can be tighter.
 
 ## Exercise 5 pag 51
 
@@ -152,7 +160,7 @@ Then the optimal cluster uses $m$ as the center, and $\phi^{opt}_{kcenter} (P, k
 
 Let $P$ be a set of $N$ points in a metric space $(M, d)$, and let $C = (C_1 , C_2 , . . . , C_k ; c_1 , c_2 , . . . , c_k)$ be a k-clustering of $P$. Initially, each point $q ∈ P$ is represented by a pair $(ID(q), (q, c(q)))$, where $ID(q)$ is a distinct key in $[0, N − 1]$ and $c(q) ∈ \{c_1 , . . . , c_k\}$ is the center of the cluster of $q$.
 
-1. Design a 2-round *MapReduce* algorithm that for each cluster center $c_i​$ determines the most distant point among those belonging to the cluster $C_i​$ (ties can be broken arbitrarily).
+1. Design a 2-round *MapReduce* algorithm that for each cluster center $c_i$ determines the most distant point among those belonging to the cluster $C_i$ (ties can be broken arbitrarily).
 2. Analyze the local and aggregate space required by your algorithm. Your algorithm must require $o(N)$ local space and $O (N)$ aggregate space.
 
 ### Solution
@@ -164,7 +172,7 @@ Let $P$ be a set of $N$ points in a metric space $(M, d)$, and let $C = (C_1 , C
 
 - *Reduce*:
 
-  - Gather by key the subsets $P^j$ and for each different $c(q)$ produce the pair $(c(q_j), (q_j, d(c(q_j),q_j)))$ where $q_j=\arg\!\max_{q_j}\{d(c(q_j),q_j)~~\forall~q_j\in P^j\}​$.
+  - Gather by key the subsets $P^j$ and for each different $c(q)$ produce the pair $(c(q_j), (q_j, d(c(q_j),q_j)))$ where $q_j=\arg\!\max_{q_j}\{d(c(q_j),q_j)~~\forall~q_j\in P^j\}$.
 
     Note that new key $c(q_j) \in [1, k]$ and each subset $P^j$ produces at most one pair with key $c(q_j)$. Since we have $\sqrt{N}$ subset after this phase there are at most $\sqrt{N}$ element with same key.
 
@@ -173,7 +181,7 @@ Let $P$ be a set of $N$ points in a metric space $(M, d)$, and let $C = (C_1 , C
 - *Map*:
   - Identity.
 - *Reduce*:
-  - Gather by key the at most $\sqrt{N}$ pairs in the form $(c(q), (q, d(c(q),q)))​$;
+  - Gather by key the at most $\sqrt{N}$ pairs in the form $(c(q), (q, d(c(q),q)))$;
   - For each subset $P^k$ produce the pair $(c(q_{max}), q_{max})$ where $q_{max}=\arg\!\max_{q} \{d(c(q), q)~~\forall~q\in P^k\}$.
 
 **Analysis**
@@ -193,9 +201,9 @@ Analyze the local and aggregate space required by your algorithm. Your algorithm
 * **Input**: $\{(ID_x, (x,i_x,\gamma_x))~~~\forall x\in P\}$. Where:
   * $ID_x\in [0,N)$;
   * $i_x \in[1,k]$ is the index of the cluster a point belongs to;
-  * $\gamma_x\in \{0,1\}​$ is the color.
+  * $\gamma_x\in \{0,1\}$ is the color.
 
-* **Output**: $\{(i,b_i)~~~\forall~1 \le i \le k\}​$. Where:
+* **Output**: $\{(i,b_i)~~~\forall~1 \le i \le k\}$. Where:
   *  $b_i=\begin{cases}
     -1 \iff \text{there exist two points $\in C_i$ with different color}\\~~~0 \iff \text{every point $\in C_i$ have color 0}\\~~~1 \iff \text{every point $\in C_j$ have color 1} \end{cases}$ 
 
@@ -228,4 +236,4 @@ Analyze the local and aggregate space required by your algorithm. Your algorithm
     -1\iff \exists~\ell' \and \ell''.(b_j(\ell')=0~\and~b_j(\ell'')=1)\\~~~0 \iff \forall~\ell.b_j(\ell)=0\\~~~1 \iff \forall~\ell.b_j(\ell)=1 \end{cases}$
 
 **Analysis**
-Input pairs for any phase are at most $\sqrt{N}​$, so  $M_L=O(\sqrt{N})=o(N)​$ and we have to process $\sqrt{N}​$ partitions of $\sqrt{N}​$ pairs each, thus $M_A=O(N)​$.
+Input pairs for any phase are at most $\sqrt{N}$, so  $M_L=O(\sqrt{N})=o(N)$ and we have to process $\sqrt{N}$ partitions of $\sqrt{N}$ pairs each, thus $M_A=O(N)$.
