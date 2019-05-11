@@ -75,3 +75,6 @@ For a given itemset $X = \{x_1 , x_2 , . . . , x_k\}$, define the measure: $\zet
 
 Say whether $\zeta$ is monotone, anti-monotone or neither one. Justify your answer.
 
+### Solution
+
+I think $\zeta$ is anti-monotone. That's why $Supp(X) \ge Supp(X~\cup~\{y\})$. Therefore by the definition of confidence $\cfrac{Supp(X)}{Supp(x_i)} \ge \cfrac{Supp(X~\cup~\{y\})}{Supp(x_i)}~~\forall~i \in [1,k] $. So the anti monotonicity property of $\zeta(X)$ is satisfied.
