@@ -115,6 +115,6 @@ The $M_L=O(\sqrt{N}) = o(N)$ since every reduce deals with at most $\sqrt{N}$ pa
 
 ### Description
 
-Not yet covered
+See Exercise 5 pag 49 in AssociationAnalysis1 file.
 
 ### Solution

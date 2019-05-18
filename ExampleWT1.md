@@ -31,7 +31,7 @@ With reference to the k-means clustering problem:
 ### Solution
 
 1. The classical Lloyd's algorithm:
-   
+  
    1. Starts with $k$ centers selected randomly from the set of points;
    2. Iteratively assign every point to the closest center;
    3. Computes the new centers of each cluster.
@@ -137,6 +137,15 @@ The $M_L=O(\sqrt{N}) = o(N)$ since every reduce deals with at most $\sqrt{N}$ pa
 
 ### Description
 
-Not yet covered
+Let $T$ be a dataset of $N$ transactions over a set $I$ of $d$ items and suppose that every itemset $X ⊆ I$ is closed (i.e. every superset $Y ⊃ X$ has smaller support).
+Let $X_1, X_2, . . .$ be the sequence of itemsets by non-increasing support, including the empty itemset ($X_1$) which has support $1$. For a given $k> 1$, let $s = Supp_T(X_k)$ and $s' = Supp_T(X_{k+1})$ and assume that $1 > s > s'> 0$.
+
+1. Show that for every itemset $X_j$ of support $s'$ (hence $j ≥ k + 1$), and for every item $a ∈ X_j$, the itemset $X_j \setminus \{a\}$ belongs to $\{X_1, X_2, . . . , X_k\}$.
+
+2. Derive an upper bound to the number of itemsets of support exactly $s'$ and, from this, an upper bound to the number of Top-$(k + 1)$ frequent itemsets.
+   (Hint: note that the previous point implies that any itemset of support $s'$ is obtained by adding an item to some $X_i$ with $1 ≤ i ≤ K$).
 
 ### Solution
+
+1. By definition $X_j \setminus \{a\}$ has a smaller support than $X_j$ so $Supp_T(X_j \setminus\{a\}) < Supp_T(X_j)$.
+
