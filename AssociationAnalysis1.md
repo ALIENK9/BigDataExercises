@@ -27,11 +27,11 @@ A way to formally prove this is by induction on the length of the itemsets in $F
 
 Consider two association rules $r_1 : A → B$  and  $r_2 : B → C$ , and suppose that both satisfy support and confidence requirements. Is it true that also $r_3 : A → C$ satisfies the requirements? If so, prove it, otherwise show a counterexample.
 
-### Solution
+### Solution $\checkmark$
 
- No, it's not true. Take, for instance, a initial itemset $\{AB, BCD, ABD, BCE\}$ and a bound *minconf$=$minsup*$=1/2$. Then: 
+ No, it's not true. Take, for instance, an initial dataset $\{AB, BC, ABD, BCE\}$ and a bound *minconf$=$minsup*$=1/2$. Then:
 
-- $Supp(A\rightarrow B) = Supp(\{AB\}) = 1/2$ 
+- $Supp(A\rightarrow B) = Supp(\{AB\}) = 1/2$
 - $Supp(B \rightarrow C) = 1/2$
 - $Conf(A\rightarrow B) = Supp(A\rightarrow B) / Supp(A)=\cfrac{1/2}{1/2}=1$
 - $Conf(B \rightarrow C) = Supp(B \rightarrow C) / Supp(B)= 1/2$
