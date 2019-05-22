@@ -81,11 +81,13 @@ For a given itemset $X = \{x_1 , x_2 , . . . , x_k\}$, define the measure: $\zet
 
 Say whether $\zeta$ is monotone, anti-monotone or neither one. Justify your answer.
 
-### Solution
+### Solution $\checkmark$
 
-Consider two itemsets X, Y such that $X \subseteq Y$. By definition $Conf(x_i → X \setminus \{x_i\})=\cfrac{Supp(X)}{Supp(x_i)}$. 
+Consider two itemsets $X$,$Y$ such that $X \subseteq Y$. By definition $Conf(x_i → X \setminus \{x_i\})=\cfrac{Supp(X)}{Supp(\{x_i\})}$. 
 
-However we don't know what the support of $x_i$ would be with respect to $Y$. If $Y$ contains more itemsets that contain $x_i$ the support would increase, but if $Supp_{\{Y \setminus X\}}(x_i)=0$ the support in $Y$ would decrease compared to the support in $X$. Therefore $\zeta$ depends on the specific element that distinguish $X$ from $Y$ and so there is no arbitrary relation of monotonicity. **TO CHECK**
+Then, if $x_i$ is the item minimizing the confidence of the rule, we know that $\zeta(X) = Conf(\{x_i\}\rightarrow X\setminus \{x_i\})=\cfrac{Supp(X)}{Supp(\{x_i\})} \ge \cfrac{Supp(Y)}{Supp(\{x_i\})}$ by anti monotonicity of support. We don't know if $x_i$ is exactly the item minimizing confidence of the rule in $Y$, but we know by definition that $Conf(\{x_i\}\rightarrow Y\setminus \{x_i\}) = \cfrac{Supp(Y)}{Supp(\{x_i\})} \ge \zeta(Y)~ \forall~i$ since $\zeta$ returns the minimum confidence.
+
+Then $X \subseteq Y \implies \zeta(Y) \le \zeta(X)$, so $\zeta$ is anti-monotone.
 
 
 
@@ -109,24 +111,28 @@ That is, the fraction of strings of $T$ that contain $X$ as substring. Do the fo
    - $C_{k+1} = \{Xa : X \in F_k, a \in \mathcal{E}~\and~X[1] \cdots X [k − 1]a \in F_k\}$.
 
    Show that $F_{k+1} \subseteq C_{k+1}$.
+   
+3. Find an upper bound for the number of candidates $|C_k|$.
 
-### Solution
+### Solution $\checkmark$
 
 1. $X \subseteq Y \implies Supp_T(X) \ge Supp_T(Y)$. 
 
-   That is if $X$ is a substring of $Y$ the support of $X$ can't be less than the support of $Y$.
+   That is, if $X$ is a substring of $Y$, the support of $X$ can't be less than the support of $Y$.
 
 2. I'll prove that each frequent itemset of length $k$ must be in $C_k$ (i.e. $X \in F_k \implies X \in C_k$ which implies $F_k \subseteq C_k$).
 
-   Proof by induction on $k$. 
+   Proof by **induction** on $k$.
 
    - Basis ($k=1$). $C_1=\{a \in \mathcal{E}\} \supseteq F_1$ (by definition, since there's no prefix).
 
-   - Induction ($k > 1$).  Assume by induction hypothesis that the property holds up to index $k-1$ ($F_{i} \subseteq C_{i}~~\forall~i \le k-1$). Then consider an arbitrary _frequent_ itemset of size $k$: $X=X[1]X[2]\cdots X[k-1]X[k]$. Note that $X$ is frequent so $X \in F_k$. 
-     This itemset contains two sub-itemsets: 
+   - Induction ($k > 1$).  Assume by induction hypothesis that the property holds up to index $k-1$ ($F_{i} \subseteq C_{i}~~\forall~i \le k-1$). Then consider an arbitrary _frequent_ itemset of size $k$: $Z=Z[0]Z[1]\cdots Z[k-1]Z[k]$. Note that $Z$ is frequent so $Z \in F_k$. 
+     This itemset contains two sub-itemsets:
 
-     - $X_1=X[1]X[2]\cdots  X[k-2]X[k-1]$
-     - $X_2=X[1]X[2]\cdots X[k-2]X[k]$
+     - $Z_1=Z[0]Z[1]\cdots  Z[k-2]Z[k-1]$ (where $Z_1a=Z$ and $a = Z[k]$)
+     - $Z_2=Z[1]Z[2]\cdots Z[k-1]Z[k]$  (where $bZ_2=Z$ and $b=Z[0]$)
 
-     Clearly $X=X_1 \cup X_2$, and by anti-monotonicity of support they must be frequent (since $X$ is frequent). This means that $X_1 \in F_k$ and $X_2 \in F_k$. Therefore $X \in C_k$ by the definition above. $\square$
+     Clearly $Z=Z_1 \cup Z_2$, and by anti-monotonicity of support (described in point 1) they must be frequent (since they are substrings of $Z$ and $Z$ is frequent). This means that $Z_1 \in F_{k-1}$ and $Z_2 \in F_{k-1}$. Therefore $Z \in C_k$ by the definition of $C_k$ above. $\square$
+   
+3. An upper bound to $|C_{k+1}|$ is $|F_k| \times |\mathcal{E}|$ which are all the possible combinations of strings and final characters. Since $F_k$ contains $|F_k|$ different strings this combination would be bounded by $|F_k|\times |F_k|$.
 
