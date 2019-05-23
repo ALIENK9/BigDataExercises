@@ -143,9 +143,13 @@ Let $X_1, X_2, . . .$ be the sequence of itemsets by non-increasing support, inc
 1. Show that for every itemset $X_j$ of support $s'$ (hence $j ≥ k + 1$), and for every item $a ∈ X_j$, the itemset $X_j \setminus \{a\}$ belongs to $\{X_1, X_2, . . . , X_k\}$.
 
 2. Derive an upper bound to the number of itemsets of support exactly $s'$ and, from this, an upper bound to the number of Top-$(k + 1)$ frequent itemsets.
-   (Hint: note that the previous point implies that any itemset of support $s'$ is obtained by adding an item to some $X_i$ with $1 ≤ i ≤ K$).
+   (Hint: note that the previous point implies that any itemset of support $s'$ is obtained by adding an item to some $X_i$ with $1 ≤ i ≤ k$).
 
-### Solution
+### Solution TO CHECK
 
-1. By definition $X_j \setminus \{a\}$ has a smaller support than $X_j$ so $Supp_T(X_j \setminus\{a\}) < Supp_T(X_j)$.
+1. By definition of closed itemset, $X_j \supset X_j \setminus \{a\} \implies Supp_T(X_j) < Supp_T(X_j \setminus \{a\}) ~\forall~j  > k,~\forall~a \in X_j$. Since the sequence of itemsets $X_1, X_2, ...$ has non increasing support, then $X_j \setminus \{a\}$ must precede $X_j$ in this sequence. We know that $s'=Supp_T(X_j)$ ans so $j \ge k+1$, so the itemset $X_j \setminus \{a\} \in \{X_1, X_2, . . . , X_k\}$.
+
+2. Considering that every superset has strictly smaller support than each subset the maximum number of itemsets with the same support $s'$ is the maximum number of sets that are neither supersets nor subsets with respect to each other, so all the possible sets of length $k+1$ (since $s' = Supp_T(X_{k+1})$) . An upper bound is then $\binom{d}{k+1}$.
+
+   The top (k+1) frequent itemsets, that is the number of itemsets with support $\ge s'=Supp_T(X_{k+1})$ are then $\sum \limits_{i=1}^{k+1}\binom{d}{i} = \sum \limits_{i=0}^{k+1}\binom{d}{i} -1 = 2^{k+1}-1$. The minus 1 avoids to count the empty set.
 
