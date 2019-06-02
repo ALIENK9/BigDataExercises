@@ -149,4 +149,3 @@ Let $X_1, X_2, . . .$ be the sequence of itemsets by non-increasing support, inc
 
 1. By definition of closed itemset, $X_j \supset X_j \setminus \{a\} \implies Supp_T(X_j) < Supp_T(X_j \setminus \{a\}) ~\forall~j  > k,~\forall~a \in X_j$. Since the sequence of itemsets $X_1, X_2, ...$ has non increasing support, then $X_j \setminus \{a\}$ must precede $X_j$ in this sequence. We know that $s'=Supp_T(X_j)$ ans so $j \ge k+1$ $(Supp(X_j \setminus \{a\}) \ge s > s')$ , so the itemset $X_j \setminus \{a\} \in \{X_1, X_2, . . . , X_k\}$.
 2. It's the number of itemsets with support $\ge s$, which are $k$ and the ones with support $s' \ge Supp \ge s$, which are $k \cdot d$. So the number is $k + k \cdot d$.
-
