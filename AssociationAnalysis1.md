@@ -14,7 +14,7 @@ Argue rigorously that given a family $F$ of itemsets of the same length, represe
 
 APRIORI-GEN, in order to generate the new set of candidates of size $\ell$, called $C_\ell$, considers each pairs of frequent itemset in $F_{\ell-1}$ (all of size $\ell-1$) that share a prefix of size $\ell-2$. Thus the algorithm looks for pairs of itemsets that differ for the last element only and the only way it could generate twice the same itemset is by taking two different itemsets with the prefix and the last element in common, so by taking a pair of identical itemsets. This is not possible, since the algorithm doesn't generate the same element twice.
 
-A way to formally prove this is by induction on the length of the itemsets in $F$, which is $\ell-1$. The thesis is that $\forall~\ell \ge 2~~C_\ell$ doesn't contain duplicates.  
+A way to formally prove this is by induction on the length of the itemsets in $F$, which is $\ell-1$. The thesis is that $\forall~\ell \ge 2~~C_\ell$ doesn't contain duplicates.
 
 - Base: $\ell-1 = 1$. $F_1$ is a set of singletons and cannot contains duplicates by construction. Therefore taking distinct pair of itemsets only once it's not possible to generate duplicates in $C_2$.
 - Induction: $\ell -1 > 1$. By induction hypothesis $C_{\ell-1}$ contains no duplicates. Then, since $F_{\ell-1} \subseteq C_{\ell-1}$, also $F_{\ell-1}$ cannot contain duplicates. Since the only way to generate a duplicate would be to have a duplicate in $F_{\ell-1}$, as argued before, we conclude that $C_\ell$ doesn't contain duplicates. $\square$
@@ -55,9 +55,11 @@ Let
 
 What relationships do exist among the $c_i$'s?
 
-### Solution
+### Solution $\checkmark$
 
-Anti monotonicity of support for rules states that for $0 \ne Y' \subset Y \subset Z$ we have $\cfrac{Supp(Z)}{Supp(Z\setminus Y)} \le \cfrac{Supp(Z)}{Supp(Z\setminus Y')}$.
+Anti monotonicity of support for rules states that for $0 \ne Y' \subset Y \subset Z$ we have $\cfrac{Supp(Z)}{Supp(Z\setminus Y)} \le \cfrac{Supp(Z)}{Supp(Z\setminus Y')}$. 
+
+Thus we can say the following.
 
 $c_2=\cfrac{Supp(ABC)}{Supp(A)} \le \cfrac{Supp(ABC)}{Supp(AC)} = c_3$ 
 
@@ -112,7 +114,7 @@ That is, the fraction of strings of $T$ that contain $X$ as substring. Do the fo
 
    Show that $F_{k+1} \subseteq C_{k+1}$.
    
-3. Find an upper bound for the number of candidates $|C_k|$.
+3. Find an upper bound for the number of candidates $|C_{k+1}|$.
 
 ### Solution $\checkmark$
 
@@ -122,17 +124,40 @@ That is, the fraction of strings of $T$ that contain $X$ as substring. Do the fo
 
 2. I'll prove that each frequent itemset of length $k$ must be in $C_k$ (i.e. $X \in F_k \implies X \in C_k$ which implies $F_k \subseteq C_k$).
 
-   Proof by **induction** on $k$.
+   Consider an arbitrary _frequent_ itemset of size $k+1$:
 
-   - Basis ($k=1$). $C_1=\{a \in \mathcal{E}\} \supseteq F_1$ (by definition, since there's no prefix).
+   - $Z=Z[0]Z[1]\cdots Z[k]Z[k+1]$. 
 
-   - Induction ($k > 1$).  Assume by induction hypothesis that the property holds up to index $k-1$ ($F_{i} \subseteq C_{i}~~\forall~i \le k-1$). Then consider an arbitrary _frequent_ itemset of size $k$: $Z=Z[0]Z[1]\cdots Z[k-1]Z[k]$. Note that $Z$ is frequent so $Z \in F_k$. 
-     This itemset contains two sub-itemsets:
-
-     - $Z_1=Z[0]Z[1]\cdots  Z[k-2]Z[k-1]$ (where $Z_1a=Z$ and $a = Z[k]$)
-     - $Z_2=Z[1]Z[2]\cdots Z[k-1]Z[k]$  (where $bZ_2=Z$ and $b=Z[0]$)
-
-     Clearly $Z=Z_1 \cup Z_2$, and by anti-monotonicity of support (described in point 1) they must be frequent (since they are substrings of $Z$ and $Z$ is frequent). This means that $Z_1 \in F_{k-1}$ and $Z_2 \in F_{k-1}$. Therefore $Z \in C_k$ by the definition of $C_k$ above. $\square$
+   Note that $Z$ is frequent so $Z \in F_{k+1}$. This itemset contains two sub-itemsets:
    
-3. An upper bound to $|C_{k+1}|$ is $|F_k| \times |\mathcal{E}|$ which are all the possible combinations of strings and final characters. Since $F_k$ contains $|F_k|$ different strings this combination would be bounded by $|F_k|\times |F_k|$.
+   - $Z_1=Z[0]Z[1]\cdots  [k-1]Z[k]Z$ (where $Z_1a=Z$ and $a = Z[k]$)
+   - $Z_2=Z[1]Z[2]\cdots Z[k]Z[k+1]$  (where $bZ_2=Z$ and $b=Z[0]$)
+   
+   Clearly $Z=Z_1 \cup Z_2$, and by anti-monotonicity of support (described in point 1) they must be frequent (since they are substrings of $Z$ and $Z$ is frequent). This means that $Z_1 \in F_{k}$ and $Z_2 \in F_{k}$. Therefore $Z \in C_{k+1}$ by the definition of $C_k$ above. $\square$
+   
+3. An upper bound to $|C_{k+1}|$ is $|F_k| \times |\mathcal{E}|$, which are all the possible combinations of strings and final characters. That's because $C_{k+1}$ is obtained appending a character of the alphabet to a string in $F_k$.
 
+## Correctness of mining rules algorithm (pag 34)
+
+### Proof of AP-GENRULES
+
+Bu induction on $m$. Assume that the algorithm is correct and computes all the rules of length $ < m$ for some value $m$.
+
+- Base case: $m=1$, then $H_{Z, 1}$ is trivially correct, since it contains all association rules over $Z$ considering subsets of length 1.
+- Induction: by induction hypothesis $H_{Z, m-1}$ is the correct set of rules towards subsets of length $m-1$. Then `Apriori-gen` generates the correct candidates of length $m$. This itemset is refined and only frequent rules are kept. So the algorithm is correct.
+
+### Proof of main algorithm
+
+The algorithm to mine association rules iterates over the set of frequent itemsets calculated using APRIORI algorithm. It calls the AP-GENRULES algorithm on each frequent itemset and return the union of all rules generated from all frequent itemsets. Then it must generate all possible rules of confidence $> minconf$. It's not possible that a rule generated by a non frequent itemset is frequent.
+
+## Exercise pag 39
+
+### Description
+
+Each itemset frequent in dataset $T$ of $n$ items, must be frequent in some $T_j$ (partitions of dataset) each with $O(n/k)$ items.
+
+### Solution
+
+Let $T$ be a dataset of $n$ items, $k$ a number of partitions, and $minsup$ the support threshold. Then each partition contains $O(n/k)$ items. Take a frequent itemset $X$, with absolute support $s$ (w.r.t $T$), and support $\cfrac{s}{n} \ge minsup$.
+As a consequence dividing the dataset in $k$ partition there will be at least one partition where $X$ will have absolute support at least $\bigg\lceil \cfrac{s}{k} \bigg\rceil$. 
+This mean that the support in at least one partition would be $\bigg\lceil \cfrac{s}{k} \bigg\rceil \cdot \cfrac{k}{n} \ge \cfrac{s}{n}$, and so $X$ will still be frequent.
