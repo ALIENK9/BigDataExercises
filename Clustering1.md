@@ -29,9 +29,9 @@ Partition algorithm to perform clustering from a set $S$ of $k$ centers and a se
 Let $S = {c_1 , c_2 , . . . , c_k } ⊆ P$
 
 *for*  $i ← 1$   *to*   $k$  *do*  $C_i ← {c_i}$ 	*// Initialize each cluster with its center*
-*for* *each*  $p ∈ P \setminus S$  *do*	    	 *// For each point that is not a center* 
-	$\ell← argmin_{i=1,k}~\{d(p, c_i )\}$    *// Get the index of the cluster whose center is closer to $p$ (ties broken* arbitrarily)
-	$C_\ell \leftarrow C_\ell ∪ \{p\}$			 *// Assign $p$ to the cluster of the closest center* 
+*for* *each*  $p ∈ P \setminus S$  *do*	    	   *// For each point that is not a center* 
+	$\ell← argmin_{i=1,k}~\{d(p, c_i )\}$      *// Get the index of the cluster whose center is the closest to $p$ (ties broken arbitrarily)*
+	$C_\ell \leftarrow C_\ell ∪ \{p\}$		   *// Assign $p$ to the cluster of the closest center* 
 $C ← (C_1 , C_2 , . . . , C_k ; c_1 , c_2 , . . . , c_k)$	
 *return* $C$					     *// Return the clustering*
 
@@ -42,11 +42,11 @@ The map reduce algorithm is the following:
 
 **Round 1**
 
-- *Map*: 
+- ***Map***: 
   - Map each point $x \in P\setminus S$ in $k$ different pairs representing the distance between $x$ and each of the $k$ different centers. This means:  $(ID_x , (x, f=0)) \longrightarrow (ID_x, (x, c_i, d(x,c_i)))~~~\forall i\in1..k$;
   - Add $k$ pairs $(ID_{c_i}, (c_i,c_i,0))$ one for each of the centers $c_i~\forall i\in1..k$  (distance is obviously $0$  because a center is at distance $0$ from itself);
   - At the end of the round there will be $(N-k)\cdot k + k$ different pairs: $k$ pairs for each of the $N-k$ points that are not centers, plus one pair for each of the $k$ centers.
-- *Reduce*:
+- ***Reduce***:
   - Gather by key $ID_x$, obtaining subsets of at most $k$ pairs each (precisely of either 1 or $k$ pairs);
   - Output the pairs $(ID_x, (x, \ell))$ where $\ell = \arg\!\min_{i=1..k}\{d(x,c_i)\}$.
 
@@ -54,9 +54,15 @@ The map reduce algorithm is the following:
 
 The size of the output of the map phase doesn't count in the analysis on $M_L$, since the pairs need not to be stored in the memory of the worker in charge of this computation. 
 
-For the reduce phase only $k$ pairs must be handled at the same time, thus $M_L=O(k)$.
+For the reduce phase only $k$ pairs must be handled at the same time, thus:
 
-The reduce phase has to deal with $(N-k)\cdot k+k$ pairs split into subsets of at most $k$ pairs so: $M_A=O(\cfrac{(N-k)\cdot k+k}{k}\cdot k)=O(Nk)$.
+> $M_L=O(k)$.
+
+The reduce phase has to deal with $(N-k)\cdot k+k$ pairs split into subsets of at most $k$ pairs so: 
+
+>  $M_A=O(\cfrac{(N-k)\cdot k+k}{k}\cdot k)=O(Nk)$
+
+Which means that $M_A=O(N)$ when $k \ll N$, which is a fair assumption.
 
 
 
