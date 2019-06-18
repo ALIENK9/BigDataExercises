@@ -70,7 +70,7 @@ Which means that $M_A=O(N)$ when $k \ll N$, which is a fair assumption.
 
 ### Description
 
-Show that the Farthest-first traversal algorithm can be implemented to run in $O(N · k)$ time.
+Show that the Farthest-First Traversal algorithm can be implemented to run in $O(N · k)$ time.
 
 **Hint**: make sure that in each iteration *i* of the first for-loop each point $p \in P \setminus S$ knows its closest center among $c_1, c_2, . . . , c_{i−1}$ and the distance from such a center.
 
@@ -84,19 +84,33 @@ $S ← \{c_1\}$ 	// $c_1 ∈ P$ arbitrary point
 	$S ← S ∪ \{c_i\}$
 *return* $Partition(P, S)$
 
-Step of finding point not in $S$ that maximizes distance from set of centers at iteration $i$ would require computation of $(i-1) * (N-i+1)$ distances, one for each possible pair of points in $S$ and $P \setminus S$. This would take the following number of computations: 
+The step of finding a point not in $S$ that maximizes the distance from the set of centers at iteration $i$ would require the computation of $(i-1) * (N-i+1)$ distances, one for each possible pair of points in $S$ and $P \setminus S$. This would take the following number of computations: 
 
-$\sum \limits_{i=2}^{k}[(i-1) * (N-i+1)] = \sum \limits_{i=1}^{k-1}i(N-i) =-\frac{1}{6}(k-1)\cdot k\cdot(2k-3N-1) = O(k^2N)$.
+> $\sum \limits_{i=2}^{k}[(i-1) * (N-i+1)] = $
+>
+> $= \sum \limits_{i=1}^{k-1}i(N-i) =$
+>
+> $=-\frac{1}{6}(k-1)\cdot k\cdot(2k-3N-1) =$
+>
+> $= O(k^2N)$.
 
-Suppose that each point knows its closest center and knows the distance between them. In this way the algorithm already knows $d(c_i, S)~\forall i \in 1...k$ and the complexity of the selection operation for a single iteration becomes $N-i+1 = O(N)$ since at every iteration $i$ the algorithm need to find the maximum $d(c_i, S)~\forall c_i\in P\setminus S$ and $|P\setminus S| = N-i+1$.
+Now suppose that each point knows its closest center and the distance between them. In this way the algorithm already knows $d(c_i, S)~\forall i \in 1...k$ and the complexity of the selection operation for a single iteration becomes $N-i+1 = O(N)$ since at every iteration $i$ the algorithm need to find the maximum $d(c_i, S)~\forall c_i\in P\setminus S$ and $|P\setminus S| = N-i+1$.
 
 The final complexity for the for cycle then becomes:
 
- $\sum\limits_{i=2}^{k}(N-i+1) = \sum\limits_{i=1}^{k-1} (N-i)=\sum\limits_{i=1}^{k-1}N - \sum\limits_{i=1}^{k-1}i=(k-1)N-k(k-1)\cdot\frac{1}{2}=\frac{1}{2}\cdot (k-1)(2N-k)=O(kN)$.
+>  $\sum\limits_{i=2}^{k}(N-i+1) =$
+>
+> $= \sum\limits_{i=1}^{k-1} (N-i)=$
+>
+> $=\sum\limits_{i=1}^{k-1}N - \sum\limits_{i=1}^{k-1}i=$
+>
+> $=(k-1)N-k(k-1)\cdot\frac{1}{2}=$
+>
+> $=\frac{1}{2}\cdot (k-1)(2N-k)=O(kN)$
 
-The final call to $Partition(P,S)$ runs in $O(kN)$ time, so overall time complexity is still $O(kN)$.
+The final call to $Partition(P,S)$ runs in $O(kN)$ time, so the overall time complexity is still $O(kN)$.
 
-To keep track of the distance of each point from the set of centers wee need to update at each iteration a data structure. The pseudo-code becomes: 
+To keep track of the distance of each point from the set of centers, we need to update at each iteration a data structure. The pseudo-code becomes: 
 
 $S ← \{c_1\}$ 								// $c_1 ∈ P$ arbitrary point
 $D ← Compute~d(c_i, c_1)$ $\forall~c_i \in P, i \ne 1$ 	   // $O(N)$ 
@@ -106,7 +120,7 @@ $D ← Compute~d(c_i, c_1)$ $\forall~c_i \in P, i \ne 1$ 	   // $O(N)$
 	Compute distance $\forall~p \in P\setminus S$ from $c_i$ and update $D$ if $c_i$ is closer to $p$ than previous center    // $O(N)$
 *return* $Partition(P, S)$	// $O(N)$
 
-Distances are store in a structure $D$  where:
+Distances are stored in a structure $D$  where:
 
 * $D[i].closest$ returns the closest center to point $c_i$, and
 * $D[i].distance$ returns the distance from the closest center.
@@ -119,7 +133,11 @@ Distances are store in a structure $D$  where:
 
 Let $P$  be a set of points in a metric space $(M, d)$, and let $T ⊆ P$. 
 
-For any $k < |T |, |P|$, show that  $\phi^{opt}_{kcenter}(T , k) ≤ 2\phi^{opt}_{kcenter} (P, k)$. Is the bound tight?
+For any $k < |T |, |P|$, show that:
+
+> $\phi^{opt}_{kcenter}(T , k) ≤ 2\phi^{opt}_{kcenter} (P, k)$. 
+
+Is the bound tight?
 
 ### Solution
 
@@ -131,43 +149,53 @@ Let $|k| + 1$ points be $T=\{c_1,c_2, ... , c_k, q\}⊆ P$ , where:
 For each distinct pair of points $(x,y)$ in this set: 
 
 * If $x=q \veebar y=q$, then $d(x,y) = \phi^{opt}_{kcenter}(T , k)$ and the inequality $d(x,y) ≥ \phi^{opt}_{kcenter}(T , k)$  holds for $\phi^{opt}_{kcenter}$ definition;
-* If both are the chosen points are centers, than the inequality $d(x,y) ≥ \phi^{opt}_{kcenter}(T , k)$ holds because otherwise it could be possible to obtain a better clustering by choosing $q$ as a center, and group $x$ and $y$ in the same cluster.
+* If both are the chosen points are centers, than the inequality $d(x,y) ≥ \phi^{opt}_{kcenter}(T , k)$ holds because otherwise it could be possible to obtain a better clustering by choosing $q$ as a center and grouping $x$ and $y$ in the same cluster.
 
 Therefore for every distinct pair $(x,y) \in T$,  $d(x,y) ≥ \phi^{opt}_{kcenter}(T , k)$.
 
-Since $T$ is composed of more than $k$ points, at least two of them (say $x, y$) must belong to the same cluster in the clustering resulting from the clustering procedure over $(P,k)$. In particular, they will belong to the same cluster in the optimal clustering (the one whose objective function value is $\phi^{opt}_{kcenter} (P, k)$). 
+Since $T$ is composed of more than $k$ points, at least two of them (say $x, y$) must belong to the same cluster in the clustering resulting from the clustering procedure over $(P,k)$. In particular, they will belong to the same cluster in the optimal clustering (the one whose objective function value is $\phi^{opt}_{kcenter} (P, k)$). Let $c$ be the center of this cluster.
 
-Let $c$ be the center of cluster, then, for what stated above and for the triangular inequality: 
+Then, for what stated above and for the triangular inequality: 
 
-$\phi^{opt}_{kcenter}(T,k) ≤ d(x,y) ≤ d(x,c) + d(c,y)$ .
+>  $\phi^{opt}_{kcenter}(T,k) ≤ d(x,y) ≤ d(x,c) + d(c,y)$ .
 
 Since $c$ is a center of $\phi^{opt}_{kcenter} (P, k)$:
 
-$d(x,c) , d(c,y) ≤ \phi^{opt}_{kcenter} (P, k)$.
+>  $d(x,c) , d(c,y) ≤ \phi^{opt}_{kcenter} (P, k)$.
 
 Therefore:
 
-$\phi^{opt}_{kcenter}(T,k) ≤ d(x,y) ≤ d(x,c) + d(c,y) ≤ \phi^{opt}_{kcenter} (P, k) + \phi^{opt}_{kcenter} (P, k) ≤  2\phi^{opt}_{kcenter} (P, k)$.
+>  $\phi^{opt}_{kcenter}(T,k) ≤d(x,y) \leq$
+>
+> $\leq d(x,c) + d(c,y) \leq$
+>
+> $\leq  \phi^{opt}_{kcenter} (P, k) + \phi^{opt}_{kcenter} (P, k)  \leq$
+>
+> $\leq   2\phi^{opt}_{kcenter} (P, k)$.
 
-Note that the bound is tight. For example, consider $P$ with three points: $a,b,m$, where:
+Note that the bound is tight. For example, consider $P$ with three points $a,b,m$, where:
 
 * $m$ is the mean point of $a, b$, and
 * $k=1$.
 
-Then the optimal cluster uses $m$ as the center, and $\phi^{opt}_{kcenter} (P, k) = d(a,b)/2$. 
+Then the optimal cluster uses $m$ as the center, and
+
+> $ \phi^{opt}_{kcenter} (P, k) = d(a,b)/2$. 
 
 Given set $T = \{a,b\}$, it holds that $\phi^{opt}_{kcenter}(T , k) = d(a,b)$ with either $a$ or $b$ as centers. 
 
-Therefore in this particular case $\phi^{opt}_{kcenter}(T , k) = 2\phi^{opt}_{kcenter} (P, k)$, so no bound can be tighter.
+Therefore in this particular case $\phi^{opt}_{kcenter}(T , k) = 2\phi^{opt}_{kcenter} (P, k)$, thus no bound can be tighter.
 
 ## Exercise 5 pag 51
 
 ### Description
 
-Let $P$ be a set of $N$ points in a metric space $(M, d)$, and let $C = (C_1 , C_2 , . . . , C_k ; c_1 , c_2 , . . . , c_k)$ be a k-clustering of $P$. Initially, each point $q ∈ P$ is represented by a pair $(ID(q), (q, c(q)))$, where $ID(q)$ is a distinct key in $[0, N − 1]$ and $c(q) ∈ \{c_1 , . . . , c_k\}$ is the center of the cluster of $q$.
+Let $P$ be a set of $N$ points in a metric space $(M, d)$, and let $C = (C_1 , C_2 , . . . , C_k ; c_1 , c_2 , . . . , c_k)$ be a k-clustering of $P$. 
+
+Initially, each point $q ∈ P$ is represented by a pair $(ID(q), (q, c(q)))$, where $ID(q)$ is a distinct key in $[0, N − 1]$ and $c(q) ∈ \{c_1 , . . . , c_k\}$ is the center of the cluster of $q$.
 
 1. Design a 2-round *MapReduce* algorithm that for each cluster center $c_i$ determines the most distant point among those belonging to the cluster $C_i$ (ties can be broken arbitrarily).
-2. Analyze the local and aggregate space required by your algorithm. Your algorithm must require $o(N)$ local space and $O (N)$ aggregate space.
+2. Analyze the local and aggregate space required by your algorithm. It must require $o(N)$ local space and $O (N)$ aggregate space.
 
 ### Solution
 
@@ -202,6 +230,7 @@ The first reduce phase has to deal with $\sqrt{N}$ subsets of $\sqrt{N}$ pairs e
 ### Description
 
 Let $P$ be a set of $N$ bi-colored points, partitioned in $k$ clusters $C_1,C_2,...,C_k$. Design a 2 round algorithm in MR to check whether every cluster $C_i$ is solid (i.e. whether a cluster contains all points of the same color).
+
 Analyze the local and aggregate space required by your algorithm. Your algorithm must require $o(N)$ local space and $O(N)$ aggregate space.
 
 * **Input**: $\{(ID_x, (x,i_x,\gamma_x))~~~\forall x\in P\}$. Where:
@@ -223,7 +252,7 @@ Analyze the local and aggregate space required by your algorithm. Your algorithm
 
 - *Reduce*: 
 
-  - $\forall~\ell \in [0,\sqrt{N})$ gather by key pairs $(\ell, (x,i_x,\gamma_x))$.
+  - $\forall~\ell \in [0,\sqrt{N})$ gather by key all pairs $(\ell, (x,i_x,\gamma_x))$;
 
   - Considering each partition $\ell$, reduce the pairs belonging to the same cluster $C_j = \{\text{pairs with}~i_x=j\}$ to a single pair $(j, b_j(\ell))$, where:
 
