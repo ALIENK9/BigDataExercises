@@ -76,5 +76,14 @@ Every subset of $A=\{a_1,...,a_n\}$ has support $1$ (is present in all transacti
 
 ### Description
 
+I don't have time for this.
+
 ### Solution
 
+1. Let $Supp(X_j)=s'$ and for each item $a \in X_j$ the itemset $X_j \setminus \{a\}$ is a subset of $X_j$. Then $Supp(X_j \setminus \{a\}) > Supp(X_j)$ because every itemset, including $X_j$, is closed. 
+
+   Furthermore, since $j \ge K+1$ and the sequence $X_1,X_2,...,X_j,..., X_n$ has nonincreasing support, itemset $X_j \setminus \{a\}$ must be an itemset with index $\le K$, so $X_j \setminus \{a\} \in \{X_1, ..., X_k\}$.
+
+2. The itemsets of support exactly $s' (< s)$ can be obtained by adding one item to the itemsets of length $|X_K|$. The maximum number of such itemsets is of course $K$, so the upper bound to the number of itemsets of support exactly $s'$ is $K\cdot d$, where $d=|I|$. Note that that by adding two items instead of one, you would generated a superset of the itemsets with just one item added, so the support would be $< s'$, thus they must not be accounted for.
+
+   The Top-(k+1) frequent itemsets are then all the itemsets of support $\ge s'$, thus there are $O(K+d\cdot K)$ of them (sum of the one with support $< s'$ and the one with support $=s'$).
