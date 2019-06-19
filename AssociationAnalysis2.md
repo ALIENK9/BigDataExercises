@@ -87,3 +87,38 @@ I don't have time for this.
 2. The itemsets of support exactly $s' (< s)$ can be obtained by adding one item to the itemsets of length $|X_K|$. The maximum number of such itemsets is of course $K$, so the upper bound to the number of itemsets of support exactly $s'$ is $K\cdot d$, where $d=|I|$. Note that that by adding two items instead of one, you would generated a superset of the itemsets with just one item added, so the support would be $< s'$, thus they must not be accounted for.
 
    The Top-(k+1) frequent itemsets are then all the itemsets of support $\ge s'$, thus there are $O(K+d\cdot K)$ of them (sum of the one with support $< s'$ and the one with support $=s'$).
+
+
+
+## Exercise 13 (exercise file)
+
+### Description
+
+Consider the mining of association rules from a dataset $T$ of transactions. Call standard the rules extracted with the classical framework. We say that a standard rule $r : X → Y$ is also essential if $|X| = 1$ or for each non-empty subset $X_0 ⊂ X$, $Conf(X_0 → Y ∪ (X − X_0 )) < Conf(r)$.
+
+1. Let $T$ consists of the following 5 transactions: $(ABCD), (ABCE), (ABC), (ABE),(BCD)$. Using $minsup=0.5$ and $minconf=0.5$, identify a standard rule $X → Y$ with $|X| > 1$ which is not essential.
+2. Each essential rule can be regarded as representative of a set of non-essential standard rule. Which subset? Justify your answer.
+
+### Solution
+
+1. To extract standard rules w.r.t to specified thresholds, we have to extract frequent itemsets and then generate the frequent rules.
+
+   - Identify frequent itemsets (support $\ge 0.5$).
+
+     $F=\{A, B, C, AB, AC, BC, ABC\}$
+
+   - Generate association rules from frequent itemsets (confidence $\ge 0.5$).
+
+     $R = \{A \rightarrow B, B \rightarrow A, A \rightarrow C, C \rightarrow A, B \rightarrow C, C \rightarrow B, AB \rightarrow C, AC \rightarrow B, BC \rightarrow A, A \rightarrow BC, B \rightarrow AC, C \rightarrow AB \}$
+
+     This is the set of *standard rules*.
+
+   - Consider the standard rule $r : AB \rightarrow C$.
+
+     $Conf(r) = \cfrac{Supp(ABC)}{Supp(AB)} = 3/4$
+
+     Then $Conf(A \rightarrow BC) = \cfrac{Supp(ABC)}{Supp(A)} = 3/4 = Conf(r)$. Since the confidence is not strictly less than the one of $r$, the rule $r$ is not essential.
+
+2. Boh
+
+   
