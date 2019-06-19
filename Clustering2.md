@@ -27,7 +27,9 @@ $d(p, S)^2 / \sum\limits_{q∈P\setminus S} (d(q, S))^2$
 	$S ← S \cup \{c_i\}$
 return $S$
 
-To prove the exercise I need to prove that it is possible to do a single iteration of *kmeans++* in $O(1)$ rounds with the above space constraints. I'll split the MapReduce *kmeans++* procedure in two parts:
+To prove the exercise I need to prove that it is possible to do a single iteration of *kmeans++* in $O(1)$ rounds with the above space constraints. 
+
+I'll split the MapReduce *kmeans++* procedure in two parts:
 
 - A MapReduce implementation of *Probability(P,S)* that does the computation of the probability value for each point, and
 - An implementation of a single iteration of *kmeans++*.
@@ -38,25 +40,22 @@ If both the above algorithms can run in $M_L=O(\sqrt{N})$, $M_A=O(N)$ and $O(1)$
 
 This procedure aims at efficiently computing the probability used by *kmeans++* for each point in the set.
 
-* *Input*: $(i, (x_i, f_i))$ where:
+* **Input**: $(i, (x_i, f_i))$ where:
   *  $i\in [0, N)$ is a unique number;
   * $f_i=\begin{cases}0 \iff x_i \in P\setminus S\\1 \iff x_i \in S \end{cases}$ ;
   * $|S|=m\le k$.  Note that $m=O(N)$.
-* *Output*: $(i, (x_i, p))$ where:
+* **Output**: $(i, (x_i, p))$ where:
   * $p$ is the probability of $x_i$ to be chosen as a center computed as described above.
 
 **Round 1**
 
 Compute squared distances.
 
-- *Map*:
-  
-  - $(i, x_i) \longrightarrow (x_i, d(x_i, c_j))~\forall~c_j\in S, \forall ~x_i\in P\setminus S$ where:
-    - $d(x_i, c_j)$ is the distance between center $c_j$ and $x_i$.
+- **Map**: $(i, (x_i, f_i) )\longrightarrow (x_i, d(x_i, c_j))~\forall~c_j\in S, \forall ~x_i\in P\setminus S$, where $d(x_i, c_j)$ is the distance between center $c_j$ and $x_i$.
   
   Note that $m\cdot N$ pairs will be generated.
   
-- *Reduce*:
+- **Reduce**:
 
   - Gather the $O(m)$ pairs;
   - For each set of $m$ pairs, produce a single pair containing the square of the smallest distance: $(x_i, d(x_i, c_j)) \forall ~c_j\in S \longrightarrow (i, (x_i, sd_i))$, where:
@@ -67,11 +66,9 @@ Compute squared distances.
 
 Compute the partial sum of distances.
 
-- *Map*:
+- **Map**: $(i,(x_i, sd_i)) \longrightarrow (i\mod \sqrt{N}, (x_i,sd_i))$.
 
-  - $(i,(x_i, sd_i)) \longrightarrow (i\mod \sqrt{N}, (x_i,sd_i))$.
-
-- *Reduce*:
+- **Reduce**:
   
   - Gather by key the at most $\sqrt{N}$ pairs in each subset $P^j$;
   - Output the same input pairs with a new pair $(n, sum_j)$ where:
@@ -82,13 +79,11 @@ Compute the partial sum of distances.
 
 **Round 3**
 
-Compute the sum of distances.
+Compute the final sum of distances.
 
-- *Map*:
+- **Map**: Identity.
 
-  - Identity.
-
-- *Reduce*:
+- Reduce:
   
   - Gather by key;
   - Leave unaltered all the subsets, aside from the one with all the pairs of key $n$;
@@ -100,9 +95,11 @@ Compute the sum of distances.
 
 Compute the probability.
 
-- *Map*:
-  - Map each pair dividing by the total sum of squared distances, producing the final probability: $(i,(x_i, sd_i)) \longrightarrow (i, (x_i, \cfrac{sd_i}{sum}))$.
-- *Reduce*: identity function.
+- **Map**: Map each pair dividing by the total sum of squared distances, producing the final probability: 
+  
+  >  $(i,(x_i, sd_i)) \longrightarrow (i, (x_i, \cfrac{sd_i}{sum}))$.
+  
+- **Reduce**: identity function.
 
 **Analysis**
 
@@ -114,11 +111,9 @@ The following MapReduce procedure represent how to obtain center $c_n$ for itera
 
 **Round 1**
 
-- *Map*:
+- **Map**: $(i, x_i) \longrightarrow (i\mod \sqrt{N}, x_i)$.
 
-  - $(i, x_i) \longrightarrow (i\mod \sqrt{N}, x_i)$.
-
-- *Reduce*:
+- **Reduce**:
   
   - Gather by key the subsets $P^j$ where $|P^j|\le \sqrt{N}~\forall~j$ such that $0\le j < \sqrt{N}$ ;
   - Compute $\pi_i=Probability(P^j, S)$ for each pair in subset: $(i, x_i) \longrightarrow (i, (x_i, \pi_i))$.
@@ -127,11 +122,9 @@ The following MapReduce procedure represent how to obtain center $c_n$ for itera
 
 **Round 2**
 
-- *Map* :
+- **Map**: Identity.
 
-  - Identity.
-
-- *Reduce*:
+- **Reduce**:
 
   - Gather by key the at most $\sqrt{N}$ pairs;
   - For each subset of at most $\sqrt{N}$ pairs, produce a single pair representing the selected center in subset $P^j$ chosen with probability calculated in previous round: $ (i, (x_i, \pi_i)) ~\forall i \in P^j \longrightarrow (i, x_i)$.
@@ -142,10 +135,10 @@ The following MapReduce procedure represent how to obtain center $c_n$ for itera
 
 **Round 3**
 
-- *Map*:
-  - For each of the $\sqrt{N}$ pairs (lets call the whole set of pairs $P^{ref} \subseteq P$) compute $\pi_i=Probability(P^{ref}, S)$ mapping each pair to its probability of being a final center: $(i, x_i )\longrightarrow (0, (x_i, \pi_i))$.
-- *Reduce*:
-  - Reduce the $\sqrt{N}$ pairs to a single pair $(0, x_i)$ choosing each pair from the set with probability computed in map phase.
+- **Map**:
+  - For each of the $\sqrt{N}$ pairs (lets call the whole set of pairs $P^{ref} \subseteq P$) compute $\pi_i=Probability(P^{ref}, S)$ 
+  - Map each pair to its probability of being a final center: $(i, x_i )\longrightarrow (0, (x_i, \pi_i))$.
+- **Reduce**: Reduce the $\sqrt{N}$ pairs to a single pair $(0, x_i)$ choosing each pair from the set with probability computed in map phase.
 
 **Analysis**
 
@@ -181,9 +174,7 @@ It is always possible to code them as special pairs that are never duplicated an
 
 **Round 1**
 
-Apply `Partition(P,S)` primitive (as explained in ex 2 pag 26 of Clustering 1 exercise file).
-
-Space requirements are $M_L=O(k)$, $M_A=O(N)$, and it only takes one round.
+Apply `Partition(P,S)` primitive (as explained in ex 2 pag 26 of Clustering 1 exercise file). Space requirements are $M_L=O(k)$, $M_A=O(N)$, and it only takes one round.
 
 - *Map*: 
   - Map each point $x \in P\setminus S$ in $k$ different pairs representing the distance between $x$ and each of the $k$ different centers. This means:  $(ID_x , (x, f=0)) \longrightarrow (ID_x, (x, c_i, d(x,c_i)))~~~\forall i\in1..k$;
@@ -285,19 +276,48 @@ Let $\mathcal{C}_{alg} = Partition(P, S)$ be the *k-clustering* of $P$ induced b
 
 Using Markov’s inequality determine a value $α > 1$ such that $Pr (\phi_{kmeans}(\mathcal{C}_{alg} ) ≤ \alpha · \phi^{opt}_{kmeans}(k)) \geq 1/2$.
 
-**Recall:** for a real-valued nonnegative random variable $X$ with expectation $E[X]$ and a value $a > 0$, the Markov’s inequality states that $Pr(X ≥ a) ≤ \cfrac{E[X]}{a}$.
+**Recall:** for a real-valued non-negative random variable $X$ with expectation $E[X]$ and a value $a > 0$, the Markov’s inequality states that $Pr(X ≥ a) ≤ \cfrac{E[X]}{a}$.
 
 ### Solution $\checkmark$
 
-From *theorem* in slide 18 we know that  $E[\phi_{kmeans} (\mathcal{C}_{alg})] ≤ 8(ln(k) + 2) · \phi^{opt}_{kmeans}(k)$.
+From *theorem* in slide 18 we know that:
 
-Then we obtain: $Pr(\phi_{kmeans}(\mathcal{C}_{alg})\le \alpha\cdot \phi^{opt}_{kmeans}(k)) \ge Pr(\phi_{kmeans}(\mathcal{C}_{alg})< \alpha\cdot \phi^{opt}_{kmeans}(k)) = 1-Pr(\phi_{kmeans}(\mathcal{C}_{alg})\ge \alpha\cdot \phi^{opt}_{kmeans}(k)) $
+> $E[\phi_{kmeans} (\mathcal{C}_{alg})] ≤ 8(ln(k) + 2) · \phi^{opt}_{kmeans}(k)$.
+
+Then we obtain: 
+
+>  $Pr(\phi_{kmeans}(\mathcal{C}_{alg}) \le$
+>
+> $\le \alpha\cdot \phi^{opt}_{kmeans}(k)) \ge$
+>
+> $\ge Pr(\phi_{kmeans}(\mathcal{C}_{alg}) <$
+>
+> $< \alpha\cdot \phi^{opt}_{kmeans}(k)) =$
+>
+> $ = 1-Pr(\phi_{kmeans}(\mathcal{C}_{alg}) \ge$ 
+>
+> $\ge \alpha\cdot \phi^{opt}_{kmeans}(k)) $
 
 Then using Markov inequality and the *theorem* we have:
-$1-Pr(\phi_{kmeans}(\mathcal{C}_{alg})\ge \alpha\cdot \phi^{opt}_{kmeans}(k)) \stackrel{\text{Markov}}{\ge} 1-\cfrac{E[\phi_{kmeans}(\mathcal{C_{alg}})]}{\alpha\cdot \phi^{opt}_{kmeans}(k)} \stackrel{\text{Theorem}}{\ge} 1-\cfrac{8(ln(k) + 2) · \phi^{opt}_{kmeans}(k)}{\alpha\cdot \phi^{opt}_{kmeans}(k)}=\\=1-\cfrac{8(ln(k)+2)}{\alpha}$
 
-So putting the pieces together we have: $Pr (\phi_{kmeans}(\mathcal{C}_{alg} ) ≤ \alpha · \phi^{opt}_{kmeans}(k)) \ge 1-\cfrac{8(ln(k)+2)}{\alpha}$
-And we want the quantity on the right to be  $\ge \cfrac{1}{2}$. Thus we want $\cfrac{8(ln(k)+2)}{\alpha} \le \cfrac{1}{2}$.
+>  $1-Pr(\phi_{kmeans}(\mathcal{C}_{alg}) \ge$
+>
+> $\ge \alpha\cdot \phi^{opt}_{kmeans}(k)) \stackrel{\text{Markov}}{\ge}$
+>
+> $\stackrel{\text{Markov}}{\ge} 1-\cfrac{E[\phi_{kmeans}(\mathcal{C_{alg}})]}{\alpha\cdot \phi^{opt}_{kmeans}(k)} \stackrel{\text{Theorem}}{\ge} $
+>
+> $ \stackrel{\text{Theorem}}{\ge} 1-\cfrac{8(ln(k) + 2) · \phi^{opt}_{kmeans}(k)}{\alpha\cdot \phi^{opt}_{kmeans}(k)}=\\=1-\cfrac{8(ln(k)+2)}{\alpha}$
+
+So putting the pieces together we have: 
+
+> $Pr (\phi_{kmeans}(\mathcal{C}_{alg} ) ≤ \alpha · \phi^{opt}_{kmeans}(k)) \ge 1-\cfrac{8(ln(k)+2)}{\alpha}$
+
+And we want the quantity on the right to be  $\ge \cfrac{1}{2}$. 
+
+Thus we want:
+
+>  $\cfrac{8(ln(k)+2)}{\alpha} \le \cfrac{1}{2}$.
+
 Solving the inequality we see that the bound is true with any  $\alpha \ge 16(\ln{k}+2)$.
 
 
@@ -311,7 +331,8 @@ Solving the inequality we see that the bound is true with any  $\alpha \ge 16(\l
 Let $\mathcal{C}_{alg} = Partition(P, S)$ be the k-clustering of $P$ induced by the set $S$ of centers returned by an execution of *k-means++*.
 
 Suppose that we know that for some value $α > 1$ the following probability bound holds:
-$Pr(\phi_{kmeans} (\mathcal{C}_{alg}) ≤ \alpha · \phi^{opt}_{kmeans}(k)) ≥ 1/2$.
+
+>  $Pr(\phi_{kmeans} (\mathcal{C}_{alg}) ≤ \alpha · \phi^{opt}_{kmeans}(k)) ≥ 1/2$.
 
 Show that the same approximation ratio, but with probability at least $1 − 1/N$, can be ensured by running several independent instances of *k-means++*, computing for each instance the clustering around the returned centers, and returning at the end the best clustering found (call it $\mathcal{C}_{best}$), i.e., the one with smallest value of the objective function.
 
