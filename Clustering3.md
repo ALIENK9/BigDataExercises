@@ -33,8 +33,17 @@ Show that by setting $t ∈ o(N)$, $H(P)$ (Hopkins statistic) can be efficiently
   
   - Gather by key every subset $P^j$ and produce a single pair $(k, (d_{min}(x_j), d_{min}(y_j)))$, where:
     
-    - $d_{min}(x_i)=d(x_i,P^j\setminus \{x_i\})=\min{\{d(x_i,p_i)~~\forall~p_i\in P^j\setminus \{x_i\}\}}$, and
-    - $d_{min}(y_i)=d(y_i,P^j\setminus \{y_i\})=\min{\{d(y_i,p_i)~~\forall~p_i\in P^j\setminus \{x_i\}\}}$.
+    - $d_{min}(x_i) = $
+    
+      $= d(x_i,P^j\setminus \{x_i\})=$
+    
+      $=\min{\{d(x_i,p_i)~~\forall~p_i\in P^j\setminus \{x_i\}\}}$, and
+    
+    - $d_{min}(y_i)=$
+    
+      $=d(y_i,P^j\setminus \{y_i\})=$
+    
+      $=\min{\{d(y_i,p_i)~~\forall~p_i\in P^j\setminus \{x_i\}\}}$.
     
     Note that $|P^j|\le t$.
   
@@ -90,11 +99,12 @@ Assume that
 - *Map*:
   
 - Extract for each point in $C$ a number in $\{0,1\}$ where $p(1) =\cfrac{t}{n}$;
-    
+  
   - If the extracted number is $0$ discard the pair, otherwise keep it;
     
+  
   Note that, on average, only $t$ pairs will be kept (it's a binomial distribution with expectation $n\cdot \cfrac{t}{n} = t$).
-    
+  
   - Map each of the extracted point in this way: $(i, x_i) \longrightarrow (i, d(p, x_i))$, where:
   
     - $i$ is an index in $\{1, t\}$, and
