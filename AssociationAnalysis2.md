@@ -180,14 +180,45 @@ We say that a standard rule $r : X → Y$ is also **essential** if:
 
      This is the set of *standard rules*.
 
-   - Consider the standard rule $r : AB \rightarrow C$. Then:
+   - Consider the standard rule $r : AB \rightarrow C$. 
+
+     Then:
 
      >  $Conf(r) = \cfrac{Supp(ABC)}{Supp(AB)} = 3/4$
-
-     Then $Conf(A \rightarrow BC) = \cfrac{Supp(ABC)}{Supp(A)} = 3/4 = Conf(r)$.
+     
+     But:
+     
+     > $Conf(A \rightarrow BC) = \cfrac{Supp(ABC)}{Supp(A)} = 3/4 = Conf(r)$.
      
      Since the confidence is not strictly less than the one of $r$, the rule $r$ is not essential.
 
-2. Ci penso, è pronta la pastasciutta
+2. **Important note:** this solution is a draft and probably sucks.
+
+   All rules $r$ of the kind $r: X \rightarrow Y$ s.t.  $|X|>1 \land |Y|=1$ may be non-essential. 
+
+   In fact:
+
+   > $Conf(r) = \cfrac{Supp(X \cup Y)}{Supp(X)} = c$
+
+   And, since $X_0$ appears in each itemset where $X \supset X_0$ appears: 
+
+   >  $Conf(X_0 \subset X \rightarrow Y \cup (X-X_0)) = \cfrac{Supp(X \cup Y)}{Supp(X_0)} = c' \leq c$.
+
+   In particular, $Supp(X_0) \geq Supp(X)$ for antimonotonicity of support.
+
+   Furthermore, note that if $|X_0|=1$ then the rule $r':X_0 \rightarrow Y$ is essential by construction.
+
+   Thus, if $Supp(X)=Supp(X_0)$ for some $X_0 \subset X$, the rule $r$ is non-essential because $c'=c$ (which violates the strict inequality), and it has the same support and confidence of $r' $, which is an essential rule when $|X_0|=1$.
+
+   This shows that each essential rule $ r' $ of the kind $r': X_0 \rightarrow Y$ s.t.  $|X|=1 \land |Y|=1$  for $X_0 \subset X$ may be a representative of all rules $r: X \rightarrow Y$ s.t.  $|X|>1 \land |Y|=1 \land Supp(X_0)=Supp(X)$. 
+
+3. We want to show that all the interesting information from non-essential rules of a certain kind can be generated using a representative essential rule.
+
+   Note that a rule is non-essential if:
+
+   - $|X| >1$, and
+   - $ \exist X_0 \ne \emptyset ⊂ X$ s.t. $Conf(X_0 → Y ∪ (X − X_0 )) \geq Conf(r)$.
+
+   Furthermore, it holds:
 
    
