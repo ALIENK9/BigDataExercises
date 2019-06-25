@@ -63,7 +63,7 @@ Consider a dataset $T$ of transactions over a set $I$ of items:
 
 2. Note that for each $X \subseteq I$, $Supp(X)=max\{Supp(Y) : Y \supseteq X \land Y \in CLO\}$ (i.e. $Y$ is closed).
 
-   Each (frequent) closed itemset $Y$ can be regarded as a representative of all those (possibly many) itemsets $X$ such that $Closure(X)=\bigcup_{t \in T_X} t=Y$.
+   Each (frequent) closed itemset $Y$ can be regarded as a representative of all those (possibly many) itemsets $X$ such that $Closure(X)=\bigcap_{t \in T_X} t=Y$.
 
    From the frequent closed itemsets and their supports one can derive all frequent itemsets and their supports. In this sense, frequent closed itemsets and their supports provide a lossless representation of the frequent itemsets and their supports. 
 
