@@ -189,7 +189,7 @@ Let $T$ be a dataset of $n$ items, $k$ a number of partitions, and $minsup$ the 
 
 Take a frequent itemset $X$, with:
 
-* Absolute support $s$ (w.r.t $T$), and
+* Absolute support $s$ (w.r.t. $T$), and
 
 * Support $\cfrac{s}{n} \ge minsup$.
 
